@@ -128,9 +128,6 @@ Extract visual features and store them on a single file. Several steps are requi
 
 ### 4.1. Split between train and test
 
-```bash
-python scripts/preprocess_dataset.py --csv datasets/data/bnb-dataset.indoor.tsv
-```
 
 ### 4.2. Extract bottom-up top-down features
 
@@ -160,12 +157,28 @@ Actually, we are just going to produce  JSON files that you can feed into the [t
 
 ### :chains: 5.1. Concatenation
 
+```bash
+python scripts/preprocess_dataset.py --csv data/bnb-train.tsv --name bnb_train
+python scripts/preprocess_dataset.py --csv data/bnb-test.tsv --name bnb_test
+```
 
 
 
 ### :busts_in_silhouette: 5.2. Image merging
 
+```bash
+python scripts/merge_photos.py --source bnb_train.py --output merge+bnb_train.py --detection-dir data/places365 
+python scripts/merge_photos.py --source bnb_test.py --output merge+bnb_test.py --detection-dir data/places365
+```
+
+
 ### 👨‍👩‍👧 5.3. Captionless insertion
+
+```bash
+python scripts/preprocess_dataset.py --csv data/bnb-dataset.indoor.tsv --captionless True --min-caption 2 --min-length 4 --name 2capt+bnb_train
+
+python scripts/preprocess_dataset.py --csv datasets/data/bnb-dataset.indoor.tsv --captionless True --min-caption 2 --min-length 4 --name 2capt+bnb_test
+```
 
 ### 👣 5.4. Instruction rephrasing
 
@@ -175,7 +188,15 @@ python scripts/extract_noun_phrases.py --source data/bnb-train.tsv --output data
 python scripts/extract_noun_phrases.py --source data/bnb-test.tsv --output data/bnb-test.np.tsv 
 
 # Extract noun phrases from R2R train set
-python scripts/extract_noun_phrases.py --source data/bnb-dataset.indoor.tsv --output data/bnb-train.np.tsv 
+python scripts/perturbate_dataset.py --infile R2R_train.json --outfile np_train.json --mode object --training True 
 
 ```
 
+### 5.5. Create the testset
+
+You need to create a testset for each dataset. Here is an example for captionless insertion.
+
+```bash
+python scripts/build_testset.py --output data/bnb/2capt+testset.json --out-listing False --captions 2capt+bnb_test.json
+
+```
