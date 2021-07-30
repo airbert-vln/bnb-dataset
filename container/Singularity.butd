@@ -1,0 +1,114 @@
+Bootstrap: docker
+From: nvidia/cudagl:9.2-devel-ubuntu18.04
+Stage: spython-base
+
+%post
+
+# Install cudnn
+CUDNN_VERSION=7.6.4.38
+apt-get update && apt-get install -y --no-install-recommends \
+  libcudnn7=$CUDNN_VERSION-1+cuda9.2 \
+  libcudnn7-dev=$CUDNN_VERSION-1+cuda9.2 
+
+# install dependencies
+NCCL_VERSION=2.6.4
+LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+apt-get update && apt-get install -y  --no-install-recommends \
+cuda-nvml-dev-9.2 \
+cuda-command-line-tools-9.2 \
+cuda-nvprof-9.2 \
+cuda-npp-dev-9.2 \
+cuda-libraries-dev-9.2 \
+cuda-minimal-build-9.2 \
+cuda-cublas-dev-9-2 \
+cython3 \
+curl \
+doxygen \
+git \
+libboost-all-dev \
+libgoogle-glog-dev \
+libgles2-mesa-dev \
+libatlas-base-dev \
+libgflags-dev \
+libhdf5-serial-dev \
+libjsoncpp-dev \
+libleveldb-dev \
+liblmdb-dev \
+libnccl-dev=2.4.8-1+cuda9.2 \
+libopencv-dev \
+libepoxy-dev \
+libglm-dev \
+libosmesa6 \
+libosmesa6-dev \
+libglew-dev \
+libprotobuf-dev \
+libsnappy-dev \
+protobuf-compiler \
+python3-dev \
+python3-numpy \
+python3-pip \
+python3-setuptools \
+python3-scipy \
+python3-sklearn \
+python3-sklearn-lib \
+wget
+apt-mark hold libnccl-dev
+apt-mark hold cuda-cublas-dev-9-2
+
+pip3 install scikit-image easydict protobuf pyyaml requests
+
+# Download cmake
+wget https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.sh -O cmake-3.12.2-Linux-x86_64.sh
+mkdir -p /opt/cmake
+sh cmake-3.12.2-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
+cmake --version
+
+# Compile MatterSim
+if [ ! -d /code/Matterport3DSimulator ]; then
+  git clone --recurse-submodules https://github.com/peteanderson80/Matterport3DSimulator /code/Matterport3DSimulator
+fi
+cd /code/Matterport3DSimulator
+mkdir -p build
+cd build
+cmake -DOSMESA_RENDERING=ON .. && \
+make -j4
+cd ../
+PYTHONPATH="/code/Matterport3DSimulator/build"
+
+
+# HDF5 (required for Pycaffe)
+wget http://h5cpp.org/download/hdf5-1.10.6.tar.gz 
+tar -xvzf hdf5-1.10.6.tar.gz 
+cd hdf5-1.10.6/ 
+./configure --prefix=/usr/local --enable-build-mode=production 
+make -j4 
+make install 
+ldconfig
+
+# Compile Bottom-up attention
+if [ ! -d /code/Matterport3DSimulator ]; then
+  git clone --recurse-submodules https://github.com/peteanderson80/bottom-up-attention.git /code/bottom-up-attention 
+fi
+cd /code/bottom-up-attention/caffe 
+wget https://raw.githubusercontent.com/arjunmajum/vln-bert/master/scripts/matterport3D-updown-features/Makefile.config
+make -j4 && make -j4 pycaffe
+PYTHONPATH="/code/bottom-up-attention/caffe/python:${PYTHONPATH}"
+cd /code/bottom-up-attention/lib && \
+2to3-2.7 -w . && \
+python3 setup.py build_ext --inplace
+
+
+%environment
+export NCCL_VERSION=2.6.4
+export LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+export PYTHONPATH="/code/Matterport3DSimulator/build"
+export PYTHONPATH="/code/bottom-up-attention/caffe/python:${PYTHONPATH}"
+export PYTHONPATH="/code/bottom-up-attention/lib:${PYTHONPATH}"
+export PYTHONPATH="/code/bottom-up-attention/lib/rpn:${PYTHONPATH}"
+
+%runscript
+exec /bin/bash "$@"
+
+%startscript
+exec /bin/bash "$@"
