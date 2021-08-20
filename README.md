@@ -45,7 +45,7 @@ python  -m torch.distributed.launch \
 This step is building a TSV file with 4 columns: listing ID, photo ID, image URL, image caption.
 A too high request rate would induce a rejection from Airbnb. Instead, it is advised to split the job among different IP addresses.
 
-You can use the pre-computed TSV file used in our paper [for training](./data/bnb-train.tsv) and [for testing](./data/bnb-test.tsv). 
+You can use the pre-computed TSV file used in our paper [for training](./data/airbnb-train-indoor-filtered.tsv) and [for testing](./data/airbnb-train-indoor-filtered.tsv). 
 Note that this file contains only a portion from Airbnb listings, and some images might not be available anymore.
 
 ### 2.1. Create a list of regions
@@ -137,6 +137,8 @@ Note that this step is also extremely slow and you might want to use multiple GP
 ```bash
 python scripts/precompute_airbnb_img_features_with_butd.py  --images data/images
 ```
+
+If this step is too difficult, open an issue and I'll try to use the [PyTorch version](https://github.com/MILVLG/bottom-up-attention.pytorch) instead.
 
 ### 4.3. Build an LMDB file
 
