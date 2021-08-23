@@ -1,7 +1,7 @@
 # :houses: BnB Dataset :houses:
 
 [![MIT](https://img.shields.io/github/license/airbert-vln/bnb-dataset)](./LICENSE.md)
-[![arXiv](https://img.shields.io/badge/arXiv-<INDEX>-green.svg)](https://arxiv.org/abs/<INDEX>)
+[![arXiv](https://img.shields.io/badge/arXiv-2108.09105-red.svg)](https://arxiv.org/abs/2108.09105)
 [![R2R 1st](https://img.shields.io/badge/R2R-🥇-green.svg)](https://eval.ai/web/challenges/challenge-page/97/leaderboard/270)
 
 This contains a set of scripts for downloading a dataset from Airbnb.
