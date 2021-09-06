@@ -12,8 +12,9 @@ This contains a set of scripts for downloading a dataset from Airbnb.
 You need to have a recent version of Python (higher than 3.6) and install dependencies:
 
 ```bash
-pip install -r requirements
+pip install -r requirements.txt
 ```
+
 
 Note that typing is extensively used in the script. This was a real time saver for detecting errors before runtime. You might want to setup properly your IDE to play well with mypy. I  recommend the [`coc.nvim`](https://github.com/neoclide/coc.nvim) extension [`coc-pyright`](https://github.com/fannheyward/coc-pyright) for [neovim](https://github.com/neovim/neovim/) users.
 
