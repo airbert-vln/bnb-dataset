@@ -211,11 +211,11 @@ python preprocess_dataset.py --csv datasets/data/bnb-dataset.indoor.tsv --captio
 
 ```bash
 # Extract noun phrases from BnB captions
-python -m scripts.extract_noun_phrases --source data/airbnb-train-indoor-filtered.tsv --output data/bnb-train.np.tsv 
+python extract_noun_phrases.py --source data/airbnb-train-indoor-filtered.tsv --output data/bnb-train.np.tsv 
 python extract_noun_phrases.py --source data/airbnb-test-indoor-filtered.tsv --output data/bnb-test.np.tsv 
 
 # Extract noun phrases from R2R train set
-python -m scripts.perturbate_dataset --infile R2R_train.json --outfile np_train.json --mode object --training True 
+python perturbate_dataset.py --infile R2R_train.json --outfile np_train.json --mode object --training True 
 
 ```
 

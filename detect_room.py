@@ -3,7 +3,7 @@ Get attributes about images
 Inspired by https://github.com/CSAILVision/places365/blob/master/run_placesCNN_unified.py
 """
 from pathlib import Path
-import argparse
+import os
 from typing import List, Iterator, Tuple, Optional, Union, Dict
 import hashlib
 import json
@@ -431,5 +431,6 @@ if __name__ == "__main__":
     cache_dir = Path.home() / ".cache" / args.outfile.parent.name
     cache_dir.mkdir(exist_ok=True, parents=True)
 
+    local_rank = os.environ.get('LOCAL_RANK', 0)
     start = max(local_rank, 0) + args.start
     detection(args, start, cache_dir)
