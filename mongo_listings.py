@@ -14,6 +14,7 @@ class Arguments(argtyped.Arguments):
     num_procs: int = 20
     reset: bool = False
 
+
 @dataclass
 class Image:
     photo_id: int
@@ -21,6 +22,7 @@ class Image:
     location: str
     state: str
     caption: str
+
 
 @dataclass
 class Review:
@@ -31,12 +33,13 @@ class Review:
     language: str
     is_superçhost: bool
 
+
 @dataclass
 class Record:
     listing_id: int
     state: str
     title: str = ""
-    rating: float = -1.
+    rating: float = -1.0
     person_capacity: int = -1
     property_type: str = ""
     description: str = ""
@@ -64,8 +67,6 @@ def load_images(room: Path) -> Iterator[Image]:
     except (FileNotFoundError, TypeError) as _:
         return
 
-
-
     for photo in photos:
         key = f"{location}/{listing_id}/{photo['id']}"
         filename = room.parents[2] / "images" / f"{key}.jpg"
@@ -73,9 +74,12 @@ def load_images(room: Path) -> Iterator[Image]:
             continue
         caption = photo["imageMetadata"]["caption"]
         yield Image(
-            photo["id"], int(room.stem), location, "downloaded", caption,
+            photo["id"],
+            int(room.stem),
+            location,
+            "downloaded",
+            caption,
         )
-
 
 
 def load_json(filename: Union[str, Path]):
@@ -93,16 +97,24 @@ def load_reviews(room: Path) -> Iterator[Review]:
 
     listing_id = int(room.name)
     for review_file in room.glob("reviews*.json"):
-        data =  load_json(review_file)
+        data = load_json(review_file)
         for review in data["data"]["merlin"]["pdpReviews"]["reviews"]:
-            yield Review(listing_id, review["id"], review["comments"], review["createdAt"], review["language"], review["reviewee"]["isSuperhost"])
+            yield Review(
+                listing_id,
+                review["id"],
+                review["comments"],
+                review["createdAt"],
+                review["language"],
+                review["reviewee"]["isSuperhost"],
+            )
+
 
 def load_room(room: Path) -> Optional[Record]:
     if not is_room_valid(room):
         return None
 
     try:
-        data = load_json( room / "room1.json")
+        data = load_json(room / "room1.json")
         record = Record(int(room.name), "downloaded", location=room.parent.name)
 
         for section in data["data"]["merlin"]["pdpSections"]:
@@ -114,12 +126,16 @@ def load_room(room: Path) -> Optional[Record]:
                 record.rating = float(section["section"]["reviewItem"]["title"])
             elif section["sectionId"] == "NAV_MOBILE":
                 record.title = section["section"]["sharingConfig"]["title"]
-                record.person_capacity = section["section"]["sharingConfig"]["personCapacity"]
+                record.person_capacity = section["section"]["sharingConfig"][
+                    "personCapacity"
+                ]
                 record.rating = section["section"]["sharingConfig"]["starRating"]
                 record.property_type = section["section"]["sharingConfig"]["propertyType"]
             elif section["sectionId"] == "LOCATION_DEFAULT":
                 record.location = section["section"]["previewLocationDetails"]["title"]
-                record.neighborhood = section["section"]["previewLocationDetails"]["content"]["htmlText"]
+                record.neighborhood = section["section"]["previewLocationDetails"][
+                    "content"
+                ]["htmlText"]
                 record.lat = float(section["section"]["lat"])
                 record.lng = float(section["section"]["lng"])
                 for detail in section["section"]["seeAllLocationDetails"]:
@@ -127,7 +143,8 @@ def load_room(room: Path) -> Optional[Record]:
                         record.getting_around = detail["content"]["htmlText"]
             elif section["sectionId"] == "SLEEPING_ARRANGEMENT_DEFAULT":
                 record.sleeping = [
-                    (detail["title"], detail["subtitle"]) for detail in section["arrangementDetails"]
+                    (detail["title"], detail["subtitle"])
+                    for detail in section["arrangementDetails"]
                 ]
             elif section["sectionId"] == "AMENITIES_DEFAULT":
                 record.amenities = {}
@@ -148,7 +165,7 @@ if __name__ == "__main__":
         db.rooms.delete_many({})
         db.reviews.delete_many({})
 
-    locations = list(args.merlin.iterdir())[args.proc_id::args.num_procs]
+    locations = list(args.merlin.iterdir())[args.proc_id :: args.num_procs]
     for location in tqdm(locations):
         rooms = list(location.iterdir())
         for room in rooms:

@@ -1,9 +1,8 @@
 from typing import List, Dict, Tuple, Any
-import sys
+import logging
 import re
 import csv
 import os
-import string
 import math
 import tarfile
 import types
@@ -24,13 +23,20 @@ from helpers import (
 )
 
 random.seed(0)
+# Allennlp is very verbose
+logging.getLogger('allennlp.data.vocabulary.plugins').setLevel(logging.WARNING)
+logging.getLogger('allennlp.data.fields.sequence_label_field').disabled = True
+logging.getLogger('allennlp.common.plugins').disabled = True
+logging.getLogger('allennlp.nn.initializers').disabled = True 
+logging.getLogger('cached_path').disabled = True 
+logging.getLogger('allennlp.modules.token_embedders.embedding').setLevel(logging.WARNING)
 
 
 class Arguments(argtyped.Arguments, underscore=True):
     source: Path
     output: Path
-    allen_model: str = "https://storage.googleapis.com/allennlp-public-models/elmo-constituency-parser-2020.02.10.tar.gz"
     noun_phrases: Path = Path("noun_phrases.json")
+    allen_model: str = "https://storage.googleapis.com/allennlp-public-models/elmo-constituency-parser-2020.02.10.tar.gz"
     cache_dir: Path = Path.home() / ".cache" / "vln"
     categories: Path = Path("categories.txt")
     matterport: Path = Path("matterport_categories.tsv")
@@ -265,7 +271,7 @@ def run_extraction(args: Arguments, local_rank: int):
 if __name__ == "__main__":
     args = Arguments()
 
-    local_rank = os.environ.get('LOCAL_RANK', -1)
+    local_rank = int(os.environ.get('LOCAL_RANK', -1))
     if local_rank <= 0:
         print(args.to_string(width=80))
 

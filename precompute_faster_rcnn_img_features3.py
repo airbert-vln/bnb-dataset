@@ -39,9 +39,7 @@ def setup_cfg(args):
     # Set score_threshold for builtin models
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.confidence_threshold
-    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = (
-        args.confidence_threshold
-    )
+    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
     cfg.freeze()
     return cfg
 
@@ -225,7 +223,7 @@ def save_json(data, filename: Union[str, Path]):
 
 
 async def lmdb_batch_write(keys: List, seq: List, env: lmdb.Environment):
-    """ Writing is faster when the seq is sorted """
+    """Writing is faster when the seq is sorted"""
     seq = sorted(seq)
     with env.begin(write=True) as txn:
         for key, el in zip(keys, seq):

@@ -11,7 +11,7 @@ import pickle
 from tqdm.auto import tqdm
 import argtyped
 import numpy as np
-from scripts.helpers import load_txt, get_key
+from helpers import load_txt, get_key
 
 csv.field_size_limit(sys.maxsize)
 

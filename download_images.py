@@ -6,7 +6,7 @@ from multiprocessing import Pool
 from pathlib import Path
 from tqdm.auto import tqdm
 import argtyped  # type: ignore
-from scripts.helpers import download_file, DownloadError
+from helpers import download_file, DownloadError
 
 
 class Arguments(argtyped.Arguments):

@@ -129,4 +129,3 @@ if __name__ == "__main__":
 
     missing = check_listings(args.merlin, args.images)
     save_json(missing, "missing.json")
-

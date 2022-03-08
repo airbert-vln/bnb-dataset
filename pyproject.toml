@@ -1,0 +1,33 @@
+[tool.black]
+line-length = 90
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '^external/'
+override = "skip"
+ignore_missing_imports = true
+disable-error-code = "override"
+
+[tool.poetry]
+name = "bnb-dataset"
+version = "0.1.0"
+description = "Set of scripts to build the BnB dataset"
+authors = ["Pierre-Louis Guhur <pierrelouisguhur@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "3.9"
+torch = "1.10.0"
+tqdm = "^4.62.3"
+tensorboardX = "2.4.1"
+boto3 = "^1.21.0"
+requests = "^2.26.0"
+transformers = "4.12.0"
+networkx = "^2.6.3"
+lmdb = "^1.2.1"
+typed-argument-parser = "^1.7.2"
+argtyped = "^0.3.1"
+gdown = "^4.2.1"
+allennlp = "2.9.0"
+allennlp-models = "2.9.0"
+
+[tool.pyright]
+reportMissingImports = false

@@ -19,15 +19,17 @@ from sklearn.metrics import pairwise_distances
 import cv2
 import argtyped
 from tqdm.auto import tqdm
+
 # add MatterSim, bottomup-attetion/caffe/python, bottomup-attetion/lib, bottomup-attetion/lib/rpn to PYTHONPATH
 import MatterSim
 import caffe  # type: ignore
 from fast_rcnn.config import cfg_from_file  # type: ignore
 from fast_rcnn.test import im_detect, _get_blobs  # type: ignore
 from fast_rcnn.nms_wrapper import nms  # type: ignore
-from timer import Timer # type: ignore
+from timer import Timer  # type: ignore
 import matplotlib as mpl
-mpl.use('Agg')
+
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 random.seed(1)
@@ -56,7 +58,9 @@ NUM_SWEEPS = 3
 VIEWS_PER_SWEEP = 12
 VIEWPOINT_SIZE = NUM_SWEEPS * VIEWS_PER_SWEEP  # Number of total views from one pano
 HEADING_INC = 360 / VIEWS_PER_SWEEP  # in degrees
-ANGLE_MARGIN = 5  # margin of error for deciding if an object is closer to the centre of another view
+ANGLE_MARGIN = (
+    5  # margin of error for deciding if an object is closer to the centre of another view
+)
 ELEVATION_START = -30  # Elevation on first sweep
 ELEVATION_INC = 30  # How much elevation increases each sweep
 
@@ -82,9 +86,7 @@ CONF_THRESH = 0.4  # increased from 0.2 in bottom-up paper
 class Arguments(argtyped.Arguments):
     caffe_root: Path
     proto: Path = Path("models/vg/ResNet-101/faster_rcnn_end2end_final/test.prototxt")
-    model: Path = Path(
-        "data/faster_rcnn_models/resnet101_faster_rcnn_final.caffemodel"
-    )
+    model: Path = Path("data/faster_rcnn_models/resnet101_faster_rcnn_final.caffemodel")
     cfg_file: Path = Path("experiments/cfgs/faster_rcnn_end2end_resnet.yml")
     updown_data: Path = Path("data/genome/1600-400-20")
     graphs: Path = Path("connectivity/")
@@ -128,13 +130,13 @@ def visual_overlay(im, dets, ix, classes, attributes):
     fig = plt.figure()
     plt.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
 
-    valid = np.where(dets['featureViewIndex'] == ix)[0]
-    objects = np.argmax(dets['cls_prob'][valid,1:], axis=1)
-    obj_conf = np.max(dets['cls_prob'][valid,1:], axis=1)
+    valid = np.where(dets["featureViewIndex"] == ix)[0]
+    objects = np.argmax(dets["cls_prob"][valid, 1:], axis=1)
+    obj_conf = np.max(dets["cls_prob"][valid, 1:], axis=1)
     attr_thresh = 0.1
-    attr = np.argmax(dets['attr_prob'][valid,1:], axis=1)
-    attr_conf = np.max(dets['attr_prob'][valid,1:], axis=1)
-    boxes = dets['boxes'][valid]
+    attr = np.argmax(dets["attr_prob"][valid, 1:], axis=1)
+    attr_conf = np.max(dets["attr_prob"][valid, 1:], axis=1)
+    boxes = dets["boxes"][valid]
 
     for i in range(len(valid)):
         bbox = boxes[i]
@@ -142,35 +144,45 @@ def visual_overlay(im, dets, ix, classes, attributes):
             bbox[0] = 1
         if bbox[1] == 0:
             bbox[1] = 1
-        cls = classes[objects[i]+1]
+        cls = classes[objects[i] + 1]
         if attr_conf[i] > attr_thresh:
-            cls = attributes[attr[i]+1] + " " + cls
+            cls = attributes[attr[i] + 1] + " " + cls
         cls += " %.2f" % obj_conf[i]
         plt.gca().add_patch(
-            plt.Rectangle((bbox[0], bbox[1]),
-                          bbox[2] - bbox[0],
-                          bbox[3] - bbox[1], fill=False,
-                          edgecolor='red', linewidth=2, alpha=0.5)
-                )
-        plt.gca().text(bbox[0], bbox[1] - 2,
-                    '%s' % (cls),
-                    bbox=dict(facecolor='blue', alpha=0.5),
-                    fontsize=10, color='white')
+            plt.Rectangle(
+                (bbox[0], bbox[1]),
+                bbox[2] - bbox[0],
+                bbox[3] - bbox[1],
+                fill=False,
+                edgecolor="red",
+                linewidth=2,
+                alpha=0.5,
+            )
+        )
+        plt.gca().text(
+            bbox[0],
+            bbox[1] - 2,
+            "%s" % (cls),
+            bbox=dict(facecolor="blue", alpha=0.5),
+            fontsize=10,
+            color="white",
+        )
     return fig
+
 
 def load_classes(args):
     # Load updown object classes
-    classes = ['__background__']
-    with open(args.caffe_root / args.updown_data / 'objects_vocab.txt') as f:
+    classes = ["__background__"]
+    with open(args.caffe_root / args.updown_data / "objects_vocab.txt") as f:
         for object in f.readlines():
-            classes.append(object.split(',')[0].lower().strip())
+            classes.append(object.split(",")[0].lower().strip())
 
     # Load updown attributes
-    attributes = ['__no_attribute__']
-    with open(args.caffe_root / args.updown_data / 'attributes_vocab.txt') as f:
+    attributes = ["__no_attribute__"]
+    with open(args.caffe_root / args.updown_data / "attributes_vocab.txt") as f:
         for att in f.readlines():
-            attributes.append(att.split(',')[0].lower().strip())
-    return classes,attributes
+            attributes.append(att.split(",")[0].lower().strip())
+    return classes, attributes
 
 
 def _load_simulator():
@@ -186,7 +198,7 @@ def _load_simulator():
 
 
 def transform_img(im: np.ndarray) -> np.ndarray:
-    """ Prep opencv BGR 3 channel image for the network """
+    """Prep opencv BGR 3 channel image for the network"""
     blob = np.array(im, copy=True)
     return blob
 
@@ -312,9 +324,7 @@ def get_detections_from_im(record, net, im, conf_thresh=CONF_THRESH):
         record["cls_prob"] = cls_prob[keep_boxes]
         record["attr_prob"] = attr_prob[keep_boxes]
         record["features"] = pool5[keep_boxes]
-        record["featureViewIndex"] = (
-            np.ones((len(keep_boxes), 1), dtype=np.float32) * ix
-        )
+        record["featureViewIndex"] = np.ones((len(keep_boxes), 1), dtype=np.float32) * ix
         record["featureHeading"] = featureHeading
         record["featureElevation"] = featureElevation
     else:
@@ -385,7 +395,9 @@ def _build_caffe_model(args: Arguments, proc_id: int):
     # print(gpu_ids, gpu_id)
     caffe.set_device(gpu_id)
     net = caffe.Net(
-        str(args.caffe_root / args.proto), caffe.TEST, weights=str(args.caffe_root / args.model)
+        str(args.caffe_root / args.proto),
+        caffe.TEST,
+        weights=str(args.caffe_root / args.model),
     )
     # print("Layer-wise parameters: ")
     # from pprint import pprint
@@ -403,13 +415,13 @@ def visual_overlay(im, dets, ix, classes, attributes):
     fig = plt.figure()
     plt.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
 
-    valid = np.where(dets['featureViewIndex'] == ix)[0]
-    objects = np.argmax(dets['cls_prob'][valid,1:], axis=1)
-    obj_conf = np.max(dets['cls_prob'][valid,1:], axis=1)
+    valid = np.where(dets["featureViewIndex"] == ix)[0]
+    objects = np.argmax(dets["cls_prob"][valid, 1:], axis=1)
+    obj_conf = np.max(dets["cls_prob"][valid, 1:], axis=1)
     attr_thresh = 0.1
-    attr = np.argmax(dets['attr_prob'][valid,1:], axis=1)
-    attr_conf = np.max(dets['attr_prob'][valid,1:], axis=1)
-    boxes = dets['boxes'][valid]
+    attr = np.argmax(dets["attr_prob"][valid, 1:], axis=1)
+    attr_conf = np.max(dets["attr_prob"][valid, 1:], axis=1)
+    boxes = dets["boxes"][valid]
 
     for i in range(len(valid)):
         bbox = boxes[i]
@@ -417,41 +429,52 @@ def visual_overlay(im, dets, ix, classes, attributes):
             bbox[0] = 1
         if bbox[1] == 0:
             bbox[1] = 1
-        cls = classes[objects[i]+1]
+        cls = classes[objects[i] + 1]
         if attr_conf[i] > attr_thresh:
-            cls = attributes[attr[i]+1] + " " + cls
+            cls = attributes[attr[i] + 1] + " " + cls
         cls += " %.2f" % obj_conf[i]
         plt.gca().add_patch(
-            plt.Rectangle((bbox[0], bbox[1]),
-                          bbox[2] - bbox[0],
-                          bbox[3] - bbox[1], fill=False,
-                          edgecolor='red', linewidth=2, alpha=0.5)
-                )
-        plt.gca().text(bbox[0], bbox[1] - 2,
-                    '%s' % (cls),
-                    bbox=dict(facecolor='blue', alpha=0.5),
-                    fontsize=10, color='white')
+            plt.Rectangle(
+                (bbox[0], bbox[1]),
+                bbox[2] - bbox[0],
+                bbox[3] - bbox[1],
+                fill=False,
+                edgecolor="red",
+                linewidth=2,
+                alpha=0.5,
+            )
+        )
+        plt.gca().text(
+            bbox[0],
+            bbox[1] - 2,
+            "%s" % (cls),
+            bbox=dict(facecolor="blue", alpha=0.5),
+            fontsize=10,
+            color="white",
+        )
     return fig
+
 
 def load_classes(args):
     # Load updown object classes
-    classes = ['__background__']
-    with open(args.caffe_root / args.updown_data / 'objects_vocab.txt') as f:
+    classes = ["__background__"]
+    with open(args.caffe_root / args.updown_data / "objects_vocab.txt") as f:
         for object in f.readlines():
-            classes.append(object.split(',')[0].lower().strip())
+            classes.append(object.split(",")[0].lower().strip())
 
     # Load updown attributes
-    attributes = ['__no_attribute__']
-    with open(args.caffe_root / args.updown_data / 'attributes_vocab.txt') as f:
+    attributes = ["__no_attribute__"]
+    with open(args.caffe_root / args.updown_data / "attributes_vocab.txt") as f:
         for att in f.readlines():
-            attributes.append(att.split(',')[0].lower().strip())
-    return classes,attributes
+            attributes.append(att.split(",")[0].lower().strip())
+    return classes, attributes
+
 
 def build_tsv(args: Arguments, proc_id: int = 0):
     dataloader = Dataloader(args, proc_id)
 
     net = _build_caffe_model(args, proc_id)
-    classes,attributes = load_classes(args)
+    classes, attributes = load_classes(args)
 
     count = 0
     t_net = Timer()
@@ -481,7 +504,10 @@ def build_tsv(args: Arguments, proc_id: int = 0):
                 )
                 for ix in range(VIEWPOINT_SIZE):
                     fig = visual_overlay(ims[ix], record, ix, classes, attributes)
-                    fig.savefig('img_features/examples/%s-%s-%d.png' % (record['scanId'],record['viewpointId'],ix))
+                    fig.savefig(
+                        "img_features/examples/%s-%s-%d.png"
+                        % (record["scanId"], record["viewpointId"], ix)
+                    )
                     plt.close()
 
             for k, v in record.items():

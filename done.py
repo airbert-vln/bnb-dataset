@@ -6,7 +6,7 @@ from multiprocessing import Pool
 from typing import List
 from tqdm.auto import tqdm
 import argtyped
-from scripts.helpers import save_json, load_json
+from helpers import save_json, load_json
 
 csv.field_size_limit(sys.maxsize)
 

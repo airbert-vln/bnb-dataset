@@ -209,7 +209,11 @@ def get_detectron_features(
     with torch.no_grad():
         output = model(current_img_list)
 
-    feat_list = _process_feature_extraction(output, im_scales, im_infos,)
+    feat_list = _process_feature_extraction(
+        output,
+        im_scales,
+        im_infos,
+    )
 
     return feat_list
 
@@ -232,7 +236,10 @@ def load_viewpointids(args: Arguments, proc_id=0):
 
 
 def get_detections_from_im(
-    args: Arguments, record: Dict, model: nn.Module, im: np.ndarray,
+    args: Arguments,
+    record: Dict,
+    model: nn.Module,
+    im: np.ndarray,
 ):
 
     if "features" not in record:
@@ -291,9 +298,7 @@ def get_detections_from_im(
     keep_boxes = np.setdiff1d(keep_boxes, np.argwhere(reject))
 
     # Calculate the heading and elevation of the center of each observation
-    featureHeading = heading + np.arctan2(
-        center_x[keep_boxes] - args.width / 2, args.foc
-    )
+    featureHeading = heading + np.arctan2(center_x[keep_boxes] - args.width / 2, args.foc)
     # normalize featureHeading
     featureHeading = np.mod(featureHeading, math.pi * 2)
     # force it to be the positive remainder, so that 0 <= angle < 360
@@ -314,9 +319,7 @@ def get_detections_from_im(
         record["boxes"] = cls_boxes[keep_boxes]
         record["cls_prob"] = cls_prob[keep_boxes]
         record["features"] = pool5[keep_boxes]
-        record["featureViewIndex"] = (
-            np.ones((len(keep_boxes), 1), dtype=np.float32) * ix
-        )
+        record["featureViewIndex"] = np.ones((len(keep_boxes), 1), dtype=np.float32) * ix
         record["featureHeading"] = featureHeading
         record["featureElevation"] = featureElevation
     else:
@@ -378,6 +381,7 @@ def filter(record: Dict, max_boxes: int):
 
 def _load_simulator():
     import MatterSim
+
     # Set up the simulator
     sim = MatterSim.Simulator()
     sim.setCameraResolution(args.width, args.height)
@@ -424,9 +428,7 @@ class Room2Room(Dataloader):
                         "scanId": state.scanId,
                         "viewpointId": state.location.viewpointId,
                         "viewHeading": np.zeros(args.viewpoint_size, dtype=np.float32),
-                        "viewElevation": np.zeros(
-                            args.viewpoint_size, dtype=np.float32
-                        ),
+                        "viewElevation": np.zeros(args.viewpoint_size, dtype=np.float32),
                         "image_h": args.height,
                         "image_w": args.width,
                         "vfov": args.vfov,
@@ -456,11 +458,12 @@ def save_json(data, filename: Union[str, Path]):
 
 
 def lmdb_batch_write(keys: List, seq: List, env: lmdb.Environment):
-    """ Writing is faster when the seq is sorted """
+    """Writing is faster when the seq is sorted"""
     seq = sorted(seq)
     with env.begin(write=True) as txn:
         for key, el in zip(keys, seq):
             lmdb_write(key, el, txn)
+
 
 def lmdb_write(key, value, txn: lmdb.Transaction):
     txn.put(key=str(key).encode("utf-8", "ignore"), value=pickle.dumps(value))
@@ -468,7 +471,9 @@ def lmdb_write(key, value, txn: lmdb.Transaction):
 
 def build_databnb_lmdb(lmdb_file: Path, database: Path):
     locations = list((database / "merlin").iterdir())
-    env = lmdb.open(str(lmdb_file), map_size=int(1e13), writemap=True, map_async=True, max_dbs=0)
+    env = lmdb.open(
+        str(lmdb_file), map_size=int(1e13), writemap=True, map_async=True, max_dbs=0
+    )
     keys = []
 
     with env.begin(write=True) as txn:
@@ -487,20 +492,28 @@ def build_databnb_lmdb(lmdb_file: Path, database: Path):
                     key = f"{location.stem}/{room.stem}/{photo['id']}"
                     filename = database / "images" / f"{key}.jpg"
                     if not filename.is_file():
-                        lmdb_write(key, {"state": "missing"}, txn) 
+                        lmdb_write(key, {"state": "missing"}, txn)
                         keys.append(key)
                     im = Image.open(filename)
-                    exif = {
-                        ExifTags.TAGS[k]: v
-                        for k, v in im._getexif().items()
-                        if k in ExifTags.TAGS
-                    } if im._getexif is not None else {}
-                    lmdb_write(key, {
-                        "state": "downloaded",
-                        "caption": photo["imageMetadata"]["caption"],
-                        "image": np.array(im),
-                        "exif": exif,
-                   }, txn)
+                    exif = (
+                        {
+                            ExifTags.TAGS[k]: v
+                            for k, v in im._getexif().items()
+                            if k in ExifTags.TAGS
+                        }
+                        if im._getexif is not None
+                        else {}
+                    )
+                    lmdb_write(
+                        key,
+                        {
+                            "state": "downloaded",
+                            "caption": photo["imageMetadata"]["caption"],
+                            "image": np.array(im),
+                            "exif": exif,
+                        },
+                        txn,
+                    )
                     keys.append(key)
         lmdb_write("keys", keys, txn)
 
@@ -527,6 +540,7 @@ class DataBnB(Dataloader):
             for _, record in cursor:
                 image = record.pop("image")
                 yield record, [image]
+
 
 def build_tsv(args: Arguments, proc_id: int):
     if args.dataloader == "room2room":

@@ -85,7 +85,13 @@ def load_detections(
     detection_dir: Path,
     hierarchy: Path,
     photo_ids: Iterable[int],
-    fieldnames=("listing_id", "photo_id", "category", "attributes", "is_indoor",),
+    fieldnames=(
+        "listing_id",
+        "photo_id",
+        "category",
+        "attributes",
+        "is_indoor",
+    ),
 ) -> Detection:
     listings: Detection = defaultdict(dict)
     classes = load_hierarchy(hierarchy)
@@ -220,9 +226,7 @@ def merging_detections(
         num_captioned_grps = sum([sum(sg) > 0 for sg in captioned_states_grps])
         while num_captioned_grps < min_captioned:
             # pick a group having at least two captioned photos
-            candidates = [
-                i for i, sg in enumerate(captioned_states_grps) if sum(sg) > 1
-            ]
+            candidates = [i for i, sg in enumerate(captioned_states_grps) if sum(sg) > 1]
             assert candidates != [], listing_id
             grp_idx = random.choice(candidates)
             grp = group_photos[grp_idx]
@@ -246,13 +250,12 @@ def merging_detections(
         # make sure we have enough images
         while len(group_photos) < min_length:
             # pick a group having at least two photos
-            grp_idx = random.choice([i for i, grp in enumerate(group_photos) if len(grp) > 1])
+            grp_idx = random.choice(
+                [i for i, grp in enumerate(group_photos) if len(grp) > 1]
+            )
             grp = group_photos[grp_idx]
 
-            idx_captioned = [
-                (idx, photo_id)
-                for idx, photo_id in enumerate(grp)
-            ]
+            idx_captioned = [(idx, photo_id) for idx, photo_id in enumerate(grp)]
             photo_idx, photo_id = random.choice(idx_captioned)
             group_photos.append((photo_id,))
             group_photos.append(tuple(p for i, p in enumerate(grp) if i != photo_idx))
@@ -292,12 +295,8 @@ if __name__ == "__main__":
     logger.info(f"Load {len(captioned)} captioned images")
 
     # Load detections
-    detections_by_listing = load_detections(
-        args.detection_dir, args.hierarchy, photo_ids
-    )
-    logger.info(
-        f"Load {sum(len(v) for v in detections_by_listing.values())} detections"
-    )
+    detections_by_listing = load_detections(args.detection_dir, args.hierarchy, photo_ids)
+    logger.info(f"Load {sum(len(v) for v in detections_by_listing.values())} detections")
 
     merging_by_photo_ids = merging_detections(
         detections_by_listing,

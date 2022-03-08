@@ -7,7 +7,7 @@ import csv
 from operator import itemgetter
 from itertools import groupby
 import argtyped
-from scripts.helpers import load_json, save_json, save_txt, get_key
+from helpers import load_json, save_json, save_txt, get_key
 
 
 def flatten(seq):

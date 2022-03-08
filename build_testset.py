@@ -12,7 +12,7 @@ import argtyped
 import lmdb
 import transformers
 from tqdm.auto import tqdm
-from scripts.helpers import load_json, save_json
+from helpers import load_json, save_json
 from utils.dataset.bnb_features_reader import PhotoId
 from utils.dataset.bnb_dataset import (
     generate_trajectory_from_listing,

@@ -204,7 +204,7 @@ def save_json(data, filename: Union[str, Path]):
 
 
 async def lmdb_batch_write(keys: List, seq: List, env: lmdb.Environment):
-    """ Writing is faster when the seq is sorted """
+    """Writing is faster when the seq is sorted"""
     seq = sorted(seq)
     with env.begin(write=True) as txn:
         for key, el in zip(keys, seq):

@@ -14,7 +14,7 @@ import pickle
 from tqdm.auto import tqdm
 import argtyped
 import numpy as np
-from scripts.helpers import save_txt, get_key
+from helpers import save_txt, get_key
 
 csv.field_size_limit(sys.maxsize)
 
@@ -36,7 +36,11 @@ def load_outdoor(detection: Path) -> List[Tuple[int, int, bool]]:
             for row in reader:
                 outdoor = eval(row["outdoor"])[1]
                 is_indoor.append(
-                    (int(row["listing_id"]), int(row["photo_id"]), bool(outdoor),)
+                    (
+                        int(row["listing_id"]),
+                        int(row["photo_id"]),
+                        bool(outdoor),
+                    )
                 )
     return is_indoor
 

@@ -75,6 +75,7 @@ class Arguments(argtyped.Arguments):
     cities: Path
     listings: Path = Path("data/listings.json")
 
+
 if __name__ == "__main__":
     args = Arguments()
     print(args.to_string(width=100))

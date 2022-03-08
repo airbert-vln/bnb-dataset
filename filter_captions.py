@@ -7,13 +7,12 @@ import csv
 from pathlib import Path
 from tqdm import tqdm
 import argtyped
-from scripts.helpers import is_empty
+from helpers import is_empty
+
 
 class Arguments(argtyped.Arguments):
     input: Path = Path("airbnb-train.tsv")
     output: Path = Path("airbnb-train-filtered.tsv")
-
-
 
 
 if __name__ == "__main__":
@@ -34,7 +33,7 @@ if __name__ == "__main__":
 
     counter = 0
     rows = []
-    for  items in tqdm(list(rows_by_listing_id.values())):
+    for items in tqdm(list(rows_by_listing_id.values())):
         uniq = set([])
         for row in items:
             if not is_empty(row["caption"]):

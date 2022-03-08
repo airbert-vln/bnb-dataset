@@ -7,7 +7,7 @@ import lmdb
 import pickle
 from tqdm.auto import tqdm
 import argtyped
-from scripts.helpers import get_key
+from helpers import get_key
 
 csv.field_size_limit(sys.maxsize)
 
@@ -49,4 +49,3 @@ if __name__ == "__main__":
 
     with open(args.output, "w") as fid:
         fid.write("\n".join(all_keys))
-

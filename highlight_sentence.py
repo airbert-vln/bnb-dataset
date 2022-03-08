@@ -70,9 +70,7 @@ class POSHighlighter:
                 continue
 
             if "children" in children:
-                start = (
-                    tree["word"][inner_pos:].find(children["word"]) + pos + inner_pos
-                )
+                start = tree["word"][inner_pos:].find(children["word"]) + pos + inner_pos
                 part_of_speeches += self._retrieve_pos(sentence, children, pos=start)
 
             inner_pos += len(children["word"])
@@ -90,7 +88,9 @@ class POSHighlighter:
 
 
 def highlight_dataset(
-    dataset: List[Dict], highlighter: Highlighter, num_samples: int,
+    dataset: List[Dict],
+    highlighter: Highlighter,
+    num_samples: int,
 ) -> None:
     counter = 0
     for item in tqdm(dataset):
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
     dataset = load_json(args.infile)
     highlighter = POSHighlighter(pos=args.pos)
-    highlight_dataset(dataset[args.id::args.num_procs], highlighter, args.num_samples)  # type: ignore
+    highlight_dataset(dataset[args.id :: args.num_procs], highlighter, args.num_samples)  # type: ignore
 
     print("Exporting to", args.outfile)
     lock = args.outfile.parent / f"{args.outfile.stem}.lock"
@@ -138,6 +138,6 @@ if __name__ == "__main__":
         time.sleep(1)
     lock.touch()
     uptodate = load_json(args.infile)
-    uptodate[args.id::args.num_procs] = dataset[args.id::args.num_procs]
+    uptodate[args.id :: args.num_procs] = dataset[args.id :: args.num_procs]
     save_json(uptodate, args.outfile)
     lock.unlink()

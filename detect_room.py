@@ -22,7 +22,7 @@ import cv2
 from PIL import Image
 import argtyped
 from torch.utils.data import Dataset, DataLoader
-import scripts.wideresnet as wideresnet
+import wideresnet as wideresnet
 
 
 csv.field_size_limit(sys.maxsize)
@@ -67,7 +67,7 @@ def download_url(url, cache_dir):
 
 
 def load_labels(
-        cache_dir: Union[Path, str]
+    cache_dir: Union[Path, str]
 ) -> Tuple[Tuple[str, ...], np.ndarray, List[str], np.ndarray]:
     """
     prepare all the labels
@@ -351,7 +351,7 @@ def run_model(
 
 
 class NumpyEncoder(json.JSONEncoder):
-    """ Special json encoder for numpy types """
+    """Special json encoder for numpy types"""
 
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -387,14 +387,16 @@ def detection(args: Arguments, proc_id: int, cache_dir: Union[Path, str]):
     photos = load_photos(args.images, cache_dir)
     print("The dataset contains a total of", len(photos))
     photos = photos[proc_id :: args.num_splits]
-    print("The split", proc_id, "over", args.num_splits, "contains", len(photos), "photos")
+    print(
+        "The split", proc_id, "over", args.num_splits, "contains", len(photos), "photos"
+    )
 
     dataset = ImageDataset(photos)
     dataloader = DataLoader(
         dataset,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
-        collate_fn=collate_fn, # type: ignore
+        collate_fn=collate_fn,  # type: ignore
     )
 
     model = model.cuda()
@@ -428,7 +430,6 @@ if __name__ == "__main__":
 
     cache_dir = Path.home() / ".cache" / args.outfile.parent.name
     cache_dir.mkdir(exist_ok=True, parents=True)
-
 
     start = max(local_rank, 0) + args.start
     detection(args, start, cache_dir)

@@ -188,6 +188,6 @@ if __name__ == "__main__":
     else:
         with open(args.listings) as fid:
             listings = [int(listing) for listing in fid.readlines()]
-        listings = listings[args.start::args.num_splits]
+        listings = listings[args.start :: args.num_splits]
         for listing in tqdm(listings):
             _download_photo_tour(listing, args.output)

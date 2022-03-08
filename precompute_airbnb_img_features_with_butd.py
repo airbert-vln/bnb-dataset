@@ -22,9 +22,10 @@ import caffe  # type: ignore
 from fast_rcnn.config import cfg_from_file  # type: ignore
 from fast_rcnn.test import im_detect, _get_blobs  # type: ignore
 from fast_rcnn.nms_wrapper import nms  # type: ignore
-from timer import Timer # type: ignore
+from timer import Timer  # type: ignore
 import matplotlib as mpl
-mpl.use('Agg')
+
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 Image.MAX_IMAGE_PIXELS = None
@@ -52,7 +53,9 @@ NUM_SWEEPS = 3
 VIEWS_PER_SWEEP = 12
 VIEWPOINT_SIZE = NUM_SWEEPS * VIEWS_PER_SWEEP  # Number of total views from one pano
 HEADING_INC = 360 / VIEWS_PER_SWEEP  # in degrees
-ANGLE_MARGIN = 5  # margin of error for deciding if an object is closer to the centre of another view
+ANGLE_MARGIN = (
+    5  # margin of error for deciding if an object is closer to the centre of another view
+)
 ELEVATION_START = -30  # Elevation on first sweep
 ELEVATION_INC = 30  # How much elevation increases each sweep
 
@@ -93,7 +96,6 @@ class Arguments(argtyped.Arguments):
     num_workers: int = 1
 
     images: Path = Path("images")
-
 
 
 def _build_caffe_model(args: Arguments, proc_id: int):
@@ -171,7 +173,9 @@ def load_classes(args):
     return classes, attributes
 
 
-def load_photo_paths(image_folder: Path, cache: Path = Path(".photo_path.txt")) -> List[str]:
+def load_photo_paths(
+    image_folder: Path, cache: Path = Path(".photo_path.txt")
+) -> List[str]:
     if not cache.is_file():
         locations = list(image_folder.iterdir())
         with open(cache, "w") as fid:
@@ -185,7 +189,7 @@ def load_photo_paths(image_folder: Path, cache: Path = Path(".photo_path.txt")) 
 
 
 def transform_img(image: Image) -> np.ndarray:
-    """ Prep opencv BGR 3 channel image for the network """
+    """Prep opencv BGR 3 channel image for the network"""
     im = np.array(image)[:, :, ::-1]
     # Scale based on minimum size
     im_size_min = np.min(im.shape[0:2])
@@ -202,6 +206,7 @@ def transform_img(image: Image) -> np.ndarray:
     )
     blob = np.array(im, copy=True)
     return blob
+
 
 class Dataloader:
     def __init__(self, photos: List[str]):
@@ -229,7 +234,10 @@ class Dataloader:
         }
         return record, im
 
-def get_detections_from_im(record: Dict, net, im: np.ndarray, conf_thresh: float =CONF_THRESH):
+
+def get_detections_from_im(
+    record: Dict, net, im: np.ndarray, conf_thresh: float = CONF_THRESH
+):
 
     if "features" not in record:
         ix = 0  # First view in the pano
@@ -302,9 +310,7 @@ def get_detections_from_im(record: Dict, net, im: np.ndarray, conf_thresh: float
         record["cls_prob"] = cls_prob[keep_boxes]
         record["attr_prob"] = attr_prob[keep_boxes]
         record["features"] = pool5[keep_boxes]
-        record["featureViewIndex"] = (
-            np.ones((len(keep_boxes), 1), dtype=np.float32) * ix
-        )
+        record["featureViewIndex"] = np.ones((len(keep_boxes), 1), dtype=np.float32) * ix
         record["featureHeading"] = featureHeading
         record["featureElevation"] = featureElevation
     else:
@@ -368,12 +374,14 @@ def filter(record: Dict, max_boxes: int):
         ]:
             record[k] = v[sorted(keep)]
 
+
 def collate_fn(x):
     return list(zip(*x))
 
+
 def build_tsv(args: Arguments, proc_id: int):
     model = _build_caffe_model(args, proc_id)
-    classes,attributes = load_classes(args)
+    classes, attributes = load_classes(args)
 
     photos = load_photo_paths(args.images)
     photos = photos[proc_id :: args.num_splits]
@@ -408,7 +416,10 @@ def build_tsv(args: Arguments, proc_id: int):
                     % (proc_id, record["features"].shape[0])
                 )
                 fig = visual_overlay(image, record, 0, classes, attributes)
-                fig.savefig('img_features/examples/%s-%s.png' % (record['listing_id'],record['photo_id']))
+                fig.savefig(
+                    "img_features/examples/%s-%s.png"
+                    % (record["listing_id"], record["photo_id"])
+                )
                 plt.close()
 
             for k, v in record.items():
@@ -442,5 +453,8 @@ if __name__ == "__main__":
         p = Pool(args.num_workers)
         p.starmap(
             build_tsv,
-            [(args, proc_id) for proc_id in range(args.start, args.start + args.num_workers)],
+            [
+                (args, proc_id)
+                for proc_id in range(args.start, args.start + args.num_workers)
+            ],
         )

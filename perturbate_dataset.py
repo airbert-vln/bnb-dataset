@@ -31,7 +31,7 @@ import spacy
 from spacy.tokenizer import Tokenizer as SpacyTokenizer
 from spacy.tokens import Token
 from utils.dataset.pano_features_reader import PanoFeaturesReader
-from scripts.highlight_sentence import POSHighlighter
+from highlight_sentence import POSHighlighter
 from vln_bert import VLNBert
 from vilbert.vilbert import BertConfig
 from utils.dataset.common import get_headings, load_nav_graphs
@@ -88,7 +88,7 @@ def fill_with_none(
 
 
 def random_order_cartesian_product(*factors):
-    """ https://stackoverflow.com/a/53895551/4986615 """
+    """https://stackoverflow.com/a/53895551/4986615"""
     amount = functools.reduce(lambda prod, factor: prod * len(list(factor)), factors, 1)
     index_linked_list = [None, None]
     for max_index in reversed(range(amount)):
@@ -219,12 +219,15 @@ class Graphs:
 
 
 def is_punctuation(s: str):
-    return s != "" and s.translate(str.maketrans("", "", string.punctuation + string.whitespace)) == ""
+    return (
+        s != ""
+        and s.translate(str.maketrans("", "", string.punctuation + string.whitespace))
+        == ""
+    )
+
 
 def load_vilbert() -> nn.Module:
-    config = BertConfig.from_json_file(
-        "data/config/bert_base_6_layer_6_connect.json"
-    )
+    config = BertConfig.from_json_file("data/config/bert_base_6_layer_6_connect.json")
     model = VLNBert.from_pretrained("data/model_zoos/vlnbert.123mine.bin", config)
     model = model.cuda()
     model.eval()
@@ -234,10 +237,19 @@ def load_vilbert() -> nn.Module:
 def synonyms(name: str):
     return set([l.name() for s in wn.synsets(name.strip()) for l in s.lemmas()])
 
+
 def hypernyms(name: str):
-    return set([l.name() for s in wn.synsets(name.strip()) for k in s.hypernyms() for l in k.lemmas()])
-    
-def same_meaning(a: str, b: str):   
+    return set(
+        [
+            l.name()
+            for s in wn.synsets(name.strip())
+            for k in s.hypernyms()
+            for l in k.lemmas()
+        ]
+    )
+
+
+def same_meaning(a: str, b: str):
     return b in synonyms(a) or a in synonyms(b) or b in hypernyms(a) or a in hypernyms(b)
 
 
@@ -292,7 +304,7 @@ class VilbertPerturbation(Perturbation):
         )
 
     def get_path_features(self, scan_id: str, path: List[str], first_heading: float):
-        """ Get features for a given path. """
+        """Get features for a given path."""
         headings = get_headings(self.graphs[scan_id], path, first_heading)
         # for next headings duplicate the last
         next_headings = headings[1:] + [headings[-1]]
@@ -367,9 +379,9 @@ class VilbertPerturbation(Perturbation):
         for index in indices.tolist():
             token = self.tokenizer.convert_ids_to_tokens(index)
             if (
-                    not token in stopwords.words()
-                    and not is_punctuation(token)
-                    and same_meaning(token, orig_word.strip())
+                not token in stopwords.words()
+                and not is_punctuation(token)
+                and same_meaning(token, orig_word.strip())
             ):
                 instr_token[word_idx] = index
                 break
@@ -645,9 +657,7 @@ class DirectionPerturbation(Perturbation):
             # start += len(found) - len(re.sub("^\W", "", found))
             # end -= len(found) - len(re.sub("\W$", "", found))
 
-            word_idx, _ = DirectionPerturbation._span_pos_to_span_tok(
-                tokens, start, end
-            )
+            word_idx, _ = DirectionPerturbation._span_pos_to_span_tok(tokens, start, end)
             previous_word = str(tokens[word_idx - 1]).lower() if word_idx > 0 else None
             attr = DirectionPerturbation._get_parent_attr(tree, start, end)
             #             print("       ", previous_word, found, start, end, attr)
@@ -813,12 +823,8 @@ class NounPhrasePerturbation(Perturbation):
                     continue
 
             if "children" in children:
-                start = (
-                    tree["word"][inner_pos:].find(children["word"]) + pos + inner_pos
-                )
-                noun_phrases += self._retrieve_noun_phrases(
-                    sentence, children, pos=start
-                )
+                start = tree["word"][inner_pos:].find(children["word"]) + pos + inner_pos
+                noun_phrases += self._retrieve_noun_phrases(sentence, children, pos=start)
 
             inner_pos += len(children["word"])
         return noun_phrases
@@ -912,9 +918,7 @@ class NounPhraseReplacedPerturbation(NounPhrasePerturbation):
                 segment.cand = []
                 for k, words in self._categories_to_words.items():
                     if k != self.replacements[w]:
-                        segment.cand += [
-                            segment.text.replace(w, cand) for cand in words
-                        ]
+                        segment.cand += [segment.text.replace(w, cand) for cand in words]
                 break
         return segments
 
@@ -925,7 +929,7 @@ def perturbations_training(
     num_samples: int,
     only_pert: bool,
     max_variants: int = 10,
-    ) -> List[Dict]:
+) -> List[Dict]:
     counter = 0
     if num_samples == -1:
         num_samples = len(dataset)
@@ -959,15 +963,15 @@ def perturbations_training(
 
     print("Removed instr", removed_instr)
     print("Removed path", removed_path)
-    print("Kept instr", sum(len(i["instructions"]) for i in perturbed ))
+    print("Kept instr", sum(len(i["instructions"]) for i in perturbed))
     print("Kept path", len(perturbed))
 
     return perturbed
 
 
 def perturbations_testing(
-        dataset: List[Dict], perturbator: Perturbation, num_samples: int, only_pert: bool
-    ) -> List[Dict]:
+    dataset: List[Dict], perturbator: Perturbation, num_samples: int, only_pert: bool
+) -> List[Dict]:
     if num_samples != -1:
         print("Ignoring the parameter num_samples")
     if only_pert:
@@ -1051,7 +1055,6 @@ def get_perturbator(
 
     elif mode == "vilbert":
         perturbators.append(VilbertPerturbation())
-
 
     if len(perturbators) == 0:
         raise RuntimeError()

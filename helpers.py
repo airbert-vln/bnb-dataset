@@ -7,7 +7,7 @@ import requests
 
 
 class DownloadError(Exception):
-    """ Unknown error during download """
+    """Unknown error during download"""
 
 
 def download_file(url: str, dest: Union[Path, str]):
@@ -22,7 +22,7 @@ def download_file(url: str, dest: Union[Path, str]):
 
 
 class TooManyRequestsError(Exception):
-    """ Can't download an image """
+    """Can't download an image"""
 
 
 def get_slug(name: str) -> str:

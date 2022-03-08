@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
         photo_tour = data["data"]["merlin"]["pdpPhotoTour"]
         if photo_tour is None:
-            continue 
+            continue
 
         for image in photo_tour["images"]:
             photos.append(
