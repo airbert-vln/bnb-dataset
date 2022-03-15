@@ -153,6 +153,23 @@ Extract visual features and store them on a single file. Several steps are requi
 
 ### 4.1. Split between train and test
 
+5% of the dataset is allocated to the testset:
+
+
+```bash
+round() {
+  printf "%.${2}f" "${1}"
+}
+
+num_rows=$(wc -l data/bnb-dataset-indoor.tsv)
+
+test=$((num_rows * 0.05))
+test=$(round $test)
+cat data/bnb-dataset-indoor.tsv | tail -n $test > data/bnb-test-indoor-filtered.tsv
+
+train=$((num_rows - test))
+cat data/bnb-dataset-indoor.tsv | head -n $train > data/bnb-train-indoor-filtered.tsv
+```
 
 ### 4.2. Extract bottom-up top-down features
 
