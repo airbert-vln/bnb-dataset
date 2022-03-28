@@ -8,12 +8,13 @@ import tarfile
 import types
 from pathlib import Path
 import random
+from torch.utils.data import Dataset, DataLoader
 from tqdm.auto import tqdm
 from transformers import PreTrainedTokenizerBase, BertTokenizer
 from allennlp.predictors.predictor import Predictor
 from allennlp.common.util import JsonDict
 from allennlp.data import Instance
-import argtyped
+import tap
 from helpers import (
     download_file,
     save_txt,
@@ -32,7 +33,7 @@ logging.getLogger('cached_path').disabled = True
 logging.getLogger('allennlp.modules.token_embedders.embedding').setLevel(logging.WARNING)
 
 
-class Arguments(argtyped.Arguments, underscore=True):
+class Arguments(tap.Tap):
     source: Path
     output: Path
     noun_phrases: Path = Path("noun_phrases.json")
@@ -50,7 +51,6 @@ class Arguments(argtyped.Arguments, underscore=True):
     batch_size: int = 100
     start: int = 0
     num_splits: int = 1
-    num_workers: int = 1
 
 
 def _json_to_instance(self, json_dict: JsonDict) -> Instance:
@@ -129,13 +129,13 @@ def batch(iterable, n=1):
 
 
 def extracting_noun_phrases(
-    sentences: List[Dict[str, Any]], args: Arguments, cuda_device: int
+    sentences: List[Dict[str, Any]], args: Arguments
 ):
     """
     Extract every noun phrases on the given sentences
     """
     # load models
-    predictor = Predictor.from_path(args.allen_model, cuda_device=cuda_device)
+    predictor = Predictor.from_path(str(args.allen_model), cuda_device=0)
     predictor.max_length = args.max_instr_length  # type: ignore
     predictor._json_to_instance = types.MethodType(_json_to_instance, predictor)  # type: ignore
 
@@ -237,7 +237,7 @@ def build_categories(args: Arguments):
     save_txt(list(set(categories)), args.cache_dir / args.categories)
 
 
-def run_extraction(args: Arguments, local_rank: int):
+def run_extraction(args: Arguments):
 
     if not (args.cache_dir / args.categories).is_file():
         build_categories(args)
@@ -252,29 +252,24 @@ def run_extraction(args: Arguments, local_rank: int):
         tf.extractall(args.parser)
 
     # Load sentences
-    start = max(local_rank, 0) + args.start
     data = load_tsv(args.source, args.fieldnames)
-    print(start, args.num_splits, len(data), len(data[start :: args.num_splits]))
-    data = data[start :: args.num_splits]
+    print(args.start, args.num_splits, len(data), len(data[args.start :: args.num_splits]))
+    data = data[args.start :: args.num_splits]
     for sample in data:
         sample["sentence"] = clean_sentence(sample["sentence"])
 
-    extracting_noun_phrases(data, args, start % args.num_workers)
+    extracting_noun_phrases(data, args)
 
     select_best_noun_phrases(data, args)
 
     print("Exporting noun phrases to ", args.output)
-    output = args.output.parent / f"{args.output.stem}.part-{start}{args.output.suffix}"
+    output = args.output.parent / f"{args.output.stem}.part-{args.start}{args.output.suffix}"
     save_tsv(data, output, args.fieldnames)
 
 
 if __name__ == "__main__":
-    args = Arguments()
-
-    local_rank = int(os.environ.get('LOCAL_RANK', -1))
-    if local_rank <= 0:
-        print(args.to_string(width=80))
+    args = Arguments().parse_args()
 
     args.cache_dir.mkdir(exist_ok=True, parents=True)
 
-    run_extraction(args, local_rank)
+    run_extraction(args)

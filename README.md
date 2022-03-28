@@ -30,38 +30,27 @@ make lfs
 ```
 
 
-You need to have a recent version of Python (higher than 3.8) and install dependencies:
+You need to have a recent version of Python (3.8 or higher) and install dependencies through `poetry`:
 
 ```bash
-# without poetry
-pip install -r requirements.txt
-# with poetry (think to prepend below command with `poetry run`)
+# install python for ubuntu 20.04
+sudo apt install python3 python3-pip 
+pip install --upgrade certifi
+pip install poetry
+
+
+# install dependencies
 poetry install
+
+# activate the environment (do it at each new shell)
+poetry shell
 ```
 
 
-Note that typing is extensively used in these scripts. This was a real time saver for detecting errors before runtime. You might want to setup properly your IDE to play well with mypy. I recommend the [`coc.nvim`](https://github.com/neoclide/coc.nvim) extension [`coc-pyright`](https://github.com/fannheyward/coc-pyright) for [neovim](https://github.com/neovim/neovim/) users.
+Note that typing is extensively used in these scripts. This was a real time saver for detecting errors before runtime. You might want to setup properly your IDE to play well with `mypy`. I recommend the [`coc.nvim`](https://github.com/neoclide/coc.nvim) extension [`coc-pyright`](https://github.com/fannheyward/coc-pyright) for [neovim](https://github.com/neovim/neovim/) users.
 
 Managing a large of images is tricky and usually take a lot of times. Usually, the scripts are splitting the task among several workers. A cache folder is keeping the order list for each worker, while each worker is producing its own output file.
 Look for `num_workers` or `num_procs` parameters in the `argtyped Arguments`.
-
-To parallelize among multiple GPUs, you can use the `distributed.launcher` script as is:
-
-```bash
-python  -m torch.distributed.launch \
-  --nproc_per_node=24 \
-  --nnodes=1 \
-  --node_rank=0 \
-  -m extract_noun_phrases \
-    --start 24 \
-    --num_splits 48 \
-    --source data/airbnb-test-indoor-filtered.tsv \
-    --output noun_phrases.tsv \
-    --num_workers 8 \
-    --batch_size 20
-
-```
-
 
 
 

@@ -1,3 +1,0 @@
-requests
-argtyped>=0.3.1
-mypy_extensions
