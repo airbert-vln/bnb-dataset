@@ -55,7 +55,7 @@ python  -m torch.distributed.launch \
   -m extract_noun_phrases \
     --start 24 \
     --num_splits 48 \
-    --source data/bnb-test-indoor.tsv \
+    --source data/airbnb-test-indoor-filtered.tsv \
     --output noun_phrases.tsv \
     --num_workers 8 \
     --batch_size 20
