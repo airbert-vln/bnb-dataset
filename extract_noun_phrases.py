@@ -49,8 +49,6 @@ class Arguments(tap.Tap):
     max_tokens: int = 5
     max_instr_length: int = 200
     batch_size: int = 100
-    start: int = 0
-    num_splits: int = 1
 
 
 def _json_to_instance(self, json_dict: JsonDict) -> Instance:
@@ -253,8 +251,8 @@ def run_extraction(args: Arguments):
 
     # Load sentences
     data = load_tsv(args.source, args.fieldnames)
-    print(args.start, args.num_splits, len(data), len(data[args.start :: args.num_splits]))
-    data = data[args.start :: args.num_splits]
+    print(f'Found {len(data)} instructions')
+
     for sample in data:
         sample["sentence"] = clean_sentence(sample["sentence"])
 
