@@ -35,9 +35,7 @@ You need to have a recent version of Python (3.8 or higher) and install dependen
 ```bash
 # install python for ubuntu 20.04
 sudo apt install python3 python3-pip 
-pip install --upgrade certifi
 pip install poetry
-
 
 # install dependencies
 poetry install
@@ -59,8 +57,8 @@ Look for `num_workers` or `num_procs` parameters in the `argtyped Arguments`.
 This step is building a TSV file with 4 columns: listing ID, photo ID, image URL, image caption.
 A too high request rate would induce a rejection from Airbnb. Instead, it is advised to split the job among different IP addresses.
 
-You can use the pre-computed TSV file used in our paper [for training](./data/airbnb-train-indoor-filtered.tsv) and [for testing](./data/airbnb-train-indoor-filtered.tsv). 
-Note that this file contains only a portion from Airbnb listings, and some images might not be available anymore.
+Please note that you can use the pre-computed TSV file used in our paper [for training](./data/airbnb-train-indoor-filtered.tsv) and [for testing](./data/airbnb-train-indoor-filtered.tsv). 
+Alse note that this file contains only a portion from Airbnb listings, and some images might not be available anymore.
 
 ### 2.1. Create a list of regions
 
@@ -92,7 +90,6 @@ You can see other examples in the [`locations/`](./locations/) folder, used as a
 ```bash
 # Download a list of listing from the list of cities
 python search_listings.py --locations data/cities.txt --output data/listings
-# FIXME I think this script is broken
 
 # Download JSON files for each listing
 python download_listings.py --listings data/listings.txt --output data/merlin
