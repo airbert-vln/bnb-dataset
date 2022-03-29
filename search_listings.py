@@ -9,7 +9,7 @@ from pathlib import Path
 from multiprocessing.pool import Pool
 import socket
 import signal
-import argtyped
+import tap
 from tqdm.auto import tqdm, trange
 from helpers import graphql_request, get_slug, save_json
 
@@ -27,7 +27,7 @@ def signal_handler(signal_received, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
-class Arguments(argtyped.Arguments):
+class Arguments(tap.Tap):
     locations: Path  # txt files containing one location per line
     correspondance: Path = Path("correspondance_listing")
     output: Path = Path("results_listing")
@@ -70,7 +70,7 @@ def extract_listings(data: Dict) -> List[int]:
 
 
 def search_location(name: str, dest: Path, limit: int):
-    print(name)
+    # print(name)
     if (dest / "listings.txt").is_file():
         return
 
@@ -102,14 +102,14 @@ def search_location(name: str, dest: Path, limit: int):
 
 
 def search_locations(location_file: Union[Path, str], limit: int = 50):
-    print(location_file)
+    # print(location_file)
 
     with open(location_file, "r") as fid:
         num_rows = sum(1 for _ in fid.readlines())
 
     with open(location_file, newline="") as f:
         reader = csv.DictReader(f, delimiter="\t", fieldnames=("name", "dest"))
-        for row in tqdm(reader, total=num_rows):
+        for row in reader:
             search_location(row["name"], Path(row["dest"]), limit)
 
 
@@ -118,7 +118,7 @@ def make_correspondance(args: Arguments):
     CSV file: location name\t path/to/location
     """
     print(f"Running {args.num_splits} splits")
-    args.correspondance.mkdir(parents=True)
+    args.correspondance.mkdir(parents=True, exist_ok=True)
 
     with open(args.locations, "r") as fid:
         locations = [l.strip() for l in fid.readlines()]
@@ -153,18 +153,17 @@ def run_downloader(args: Arguments):
     correspondances = sorted(list(args.correspondance.iterdir()))[args.start :]
     with Pool(args.num_procs) as pool:
         list(
-            pool.imap(
-                search_locations,
-                correspondances,
-                chunksize=1,
+            tqdm(
+                pool.imap(search_locations, correspondances, chunksize=1), total=len(correspondances)
             )
         )
 
 
 if __name__ == "__main__":
-    args = Arguments()
+    args = Arguments().parse_args()
+    print(args)
 
-    if not args.correspondance.is_dir():
+    if not args.correspondance.is_dir() or list(args.correspondance.glob('*.tsv')) == []:
         print("Making correspondance")
         make_correspondance(args)
 
