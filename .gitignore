@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Files that are easy to generate
+data/
+correspondance_listing/

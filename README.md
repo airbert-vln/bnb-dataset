@@ -65,16 +65,27 @@ Note that this file contains only a portion from Airbnb listings, and some image
 ### 2.1. Create a list of regions
 
 Airbnb listings are searched among a specific region. 
-We need first to initialize the list of regions. A quick hack for that consists in scrapping Wikipedia list of places, as done in the script [cities.py](./cities.py):
+We need first to initialize the list of regions. A quick hack for that consists in scrapping Wikipedia list of places, as done in the script [cities.py](./cities.py).
+
+For this script, you need to download and install Selenium. Instructions here are valid only for a Linux distribution. Otherwise, follow the guide [from Selenium documentation](https://selenium-python.readthedocs.io/installation.html).
 
 ```bash
 pip install selenium
-# Install a driver following selenium specific instructions for your platform:
-# https://selenium-python.readthedocs.io/installation.html
+wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux32.tar.gz
+mkdir -p $HOME/.local/bin
+export PATH=$PATH:$HOME/.local/bin
+tar -xvf geckodriver-v0.30.0-linux32.tar.gz -C $HOME/.local/bin
+# Testing the driver path is recognized:
+geckodriver --version
+``` 
+
+Here is how I scrapped a list of cities. You might want to update this script to order to increase the amount of cities.
+
+```bash
 python cities.py --output data/cities.txt
 ```
 
-You can other examples  in the [`locations/`](./locations/) folder.
+You can see other examples in the [`locations/`](./locations/) folder, used as an attempt to enlarge the BnB dataset.
 
 ### 2.2. Download listings
 
