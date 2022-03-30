@@ -3,13 +3,13 @@ Download details of listing
 """
 import json
 import multiprocessing
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 import time
 from itertools import product
 from multiprocessing.pool import Pool
 import multiprocessing
 from pathlib import Path
-import argtyped
+import tap
 from tqdm.auto import tqdm
 from helpers import (
     graphql_request,
@@ -146,48 +146,48 @@ def download_listing(listing_id: int, path: Path):
     _download_photo_tour(listing_id, path)
 
 
-class Arguments(argtyped.Arguments):
-    listings: Path
+class Arguments(tap.Tap):
+    listings: List[Path]
+    # directory containing a list of folders with listings.txt
+    # this directory should be generated using search_listings.py
+
     output: Path = Path("merlin")
-    num_splits: int = 10
+    # this folder is going to be used by extract_photo_metadata.py
+
+    num_splits: int = 10 # how many machines are going to work on it?
     start: int = 0
     num_procs: int = 1
 
 
-def run_downloader(args: Arguments):
-    """
-    Inputs:
-        process: (int) number of process to run
-        images_url:(list) list of images url
-    """
-    print(f"Running {args.num_procs} procs")
-    with open(args.listings) as fid:
-        listings = [int(listing) for listing in fid.readlines()]
-
-    listings = listings[args.start :: args.num_splits]
-
-    with Pool(args.num_procs) as pool:
-        list(
-            tqdm(
-                pool.istarmap(  # type: ignore
-                    _download_photo_tour,
-                    product(listings, [args.output]),
-                    chunksize=1,
-                ),
-                total=len(listings),
-            )
-        )
 
 
 if __name__ == "__main__":
-    args = Arguments()
+    args = Arguments().parse_args()
+    print(args)
+
+    # load every listings.txt
+    listings = []
+    for listing in args.listings:
+        for ltxt in listing.rglob('listings.txt'):
+            listings.append(ltxt)
+
+    print(f'Found {len(listings)} listings')
+    listings = listings[args.start :: args.num_splits]
+    print(f'This run is downloading details about {len(listings)}')
 
     if args.num_procs > 0:
-        run_downloader(args)
+        with Pool(args.num_procs) as pool:
+            list(
+                tqdm(
+                    pool.istarmap(  # type: ignore
+                        _download_photo_tour,
+                        product(listings, [args.output]),
+                        chunksize=1,
+                    ),
+                    total=len(listings),
+                )
+            )
 
     else:
-        with open(args.listings) as fid:
-            listings = [int(listing) for listing in fid.readlines()]
-        listings = listings[args.start :: args.num_splits]
         for listing in tqdm(listings):
             _download_photo_tour(listing, args.output)
