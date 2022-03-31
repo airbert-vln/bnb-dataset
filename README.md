@@ -57,8 +57,10 @@ Look for `num_workers` or `num_procs` parameters in the `argtyped Arguments`.
 This step is building a TSV file with 4 columns: listing ID, photo ID, image URL, image caption.
 A too high request rate would induce a rejection from Airbnb. Instead, it is advised to split the job among different IP addresses.
 
-Please note that you can use the pre-computed TSV file used in our paper [for training](./data/airbnb-train-indoor-filtered.tsv) and [for testing](./data/airbnb-train-indoor-filtered.tsv). 
-Alse note that this file contains only a portion from Airbnb listings, and some images might not be available anymore.
+Please note that you can use the pre-computed TSV file used in our paper [for training](./data/airbnb-train-indoor-filtered.tsv) and [for testing](./data/airbnb-train-indoor-filtered.tsv). The file was generated during Christmas 2019 (yeah, before Covid. Sounds so far away now!). Some images might not be available anymore.
+
+Also, note that this file contains only a portion from the total of Airbnb listings. It might be interesting to extend it.
+
 
 ### 2.1. Create a list of regions
 
@@ -92,7 +94,8 @@ You can see other examples in the [`locations/`](./locations/) folder, used as a
 python search_listings.py --locations data/cities.txt --output data/listings
 
 # Download JSON files for each listing
-python download_listings.py --listings data/listings.txt --output data/merlin
+python download_listings.py --listings data/listings.txt --output data/merlin --with_photo
+# Note you can download also reviews and infos (see python download_listings.py --help)
 
 # Extract photo URLs from listing export files
 python extract_photo_metadata.py --merlin data/merlin --output data/bnb-dataset-raw.tsv

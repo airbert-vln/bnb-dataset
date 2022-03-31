@@ -5,15 +5,15 @@ import csv
 from multiprocessing import Pool
 from pathlib import Path
 from tqdm.auto import tqdm
-import argtyped  # type: ignore
+import tap
 from helpers import download_file, DownloadError
 
 
-class Arguments(argtyped.Arguments):
+class Arguments(tap.Tap):
     csv_file: Path
     output: Path
     correspondance: Path
-    num_workers: int = 5
+    num_procs: int = 5
     num_parts: int = 5
     num_splits: int = 30
     start: int = 0
@@ -58,14 +58,20 @@ def run_downloader(args: Arguments):
         process: (int) number of process to run
         images_url:(list) list of images url
     """
-    print(f"Running {args.num_workers} workers")
+    print(f"Running {args.num_procs} workers")
 
     parts = [
         args.correspondance / f"{str(i)}-{str(args.num_splits)}.csv"
-        for i in range(args.start, args.start + args.num_workers)
+        for i in range(args.num_splits)
     ]
-    with Pool(args.num_workers) as pool:
-        pool.map(download_photos, parts)
+    parts = parts[args.start::args.num_parts]
+
+    if args.num_procs > 0:
+        with Pool(args.num_procs) as pool:
+            pool.map(download_photos, parts)
+    else:
+        for part in parts:
+            download_photos(part)
 
 
 def make_correspondance(args: Arguments):
@@ -86,7 +92,7 @@ def make_correspondance(args: Arguments):
     for i in range(args.num_splits):
         fieldnames = ["url", "path"]
         folder = args.output / str(i)
-        folder.mkdir(exist_ok=True)
+        folder.mkdir(exist_ok=True, parents=True)
         with open(
             args.correspondance / f"{str(i)}-{str(args.num_splits)}.csv",
             "w",
@@ -100,7 +106,8 @@ def make_correspondance(args: Arguments):
 
 
 if __name__ == "__main__":
-    args = Arguments()
+    args = Arguments().parse_args()
+    print(args)
 
     if not args.correspondance.is_dir():
         print("Making correspondance")

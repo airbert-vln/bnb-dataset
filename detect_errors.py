@@ -36,7 +36,10 @@ def check_listings(merlin: Path, images: Path) -> List[Tuple[str, str, int]]:
 
         try:
             data = load_json(listing / "photos.json")
-            _ = data["data"]["merlin"]["pdpPhotoTour"]["images"]
+            if data == {}:
+                missing.append(("no photos.json", location, listing_id))
+            else:
+                _ = data["data"]["merlin"]["pdpPhotoTour"]["images"]
         except FileNotFoundError:
             missing.append(("no photos.json", location, listing_id))
         except (TypeError, json.decoder.JSONDecodeError) as _:

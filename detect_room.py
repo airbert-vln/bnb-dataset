@@ -20,7 +20,7 @@ from torch.nn import functional as F
 import numpy as np
 import cv2
 from PIL import Image
-import argtyped
+import tap
 from torch.utils.data import Dataset, DataLoader
 import wideresnet as wideresnet
 
@@ -36,8 +36,8 @@ TSV_FIELDNAMES = [
 ]
 
 
-class Arguments(argtyped.Arguments, underscore=True):
-    outfile: Path = Path("places365/detect.tsv")
+class Arguments(tap.Tap):
+    output: Path = Path("places365/detect.tsv")
     images: Path = Path("images")
     batch_size: int = 100
     visualize: bool = False
@@ -45,7 +45,7 @@ class Arguments(argtyped.Arguments, underscore=True):
     num_attr: int = 10
     num_splits: int = 1
     start: int = 0
-    num_workers: int = -1
+    num_workers: int = 0
 
 
 # hacky way to deal with the Pytorch 1.0 update
@@ -401,7 +401,8 @@ def detection(args: Arguments, proc_id: int, cache_dir: Union[Path, str]):
 
     model = model.cuda()
 
-    filename = args.outfile.parent / f"{args.outfile.stem}.{proc_id}.tsv"
+    args.output.parent.mkdir(exist_ok=True, parents=True)
+    filename = args.output.parent / f"{args.output.stem}.{proc_id}.tsv"
     print(f"Start split {proc_id} on {len(dataset)} photos")
     with open(filename, "wt") as tsvfile:
         writer = csv.DictWriter(tsvfile, delimiter="\t", fieldnames=TSV_FIELDNAMES)
@@ -425,12 +426,12 @@ def detection(args: Arguments, proc_id: int, cache_dir: Union[Path, str]):
 
 
 if __name__ == "__main__":
-    args = Arguments()
-    print(args.to_string())
+    args = Arguments().parse_args()
+    print(args)
 
-    cache_dir = Path.home() / ".cache" / args.outfile.parent.name
+    cache_dir = Path.home() / ".cache" / args.output.parent.name
     cache_dir.mkdir(exist_ok=True, parents=True)
 
-    local_rank = os.environ.get('LOCAL_RANK', 0)
+    local_rank = int(os.environ.get('LOCAL_RANK', 0))
     start = max(local_rank, 0) + args.start
     detection(args, start, cache_dir)

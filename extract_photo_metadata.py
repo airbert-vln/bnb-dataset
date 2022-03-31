@@ -5,19 +5,20 @@ from pathlib import Path
 from typing import Set, List, Dict
 import csv
 import json
-import argtyped
+import tap
 from tqdm.auto import tqdm
 from helpers import load_json  # type: ignore
 
 
-class Arguments(argtyped.Arguments):
+class Arguments(tap.Tap):
     merlin: Path
     output: Path = Path("photos.csv")
 
 
 if __name__ == "__main__":
 
-    args = Arguments()
+    args = Arguments().parse_args()
+    print(args)
 
     # Extract photos
     photos: List[Dict] = []

@@ -206,14 +206,14 @@ numpy = ">=1.15.0"
 
 [[package]]
 name = "boto3"
-version = "1.21.27"
+version = "1.21.29"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.24.27,<1.25.0"
+botocore = ">=1.24.29,<1.25.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -222,7 +222,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.24.27"
+version = "1.24.29"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -792,7 +792,7 @@ python-versions = "*"
 
 [[package]]
 name = "ipykernel"
-version = "6.9.2"
+version = "6.10.0"
 description = "IPython Kernel for Jupyter"
 category = "main"
 optional = false
@@ -806,7 +806,7 @@ jupyter-client = "<8.0"
 matplotlib-inline = ">=0.1.0,<0.2.0"
 nest-asyncio = "*"
 psutil = "*"
-tornado = ">=4.2,<7.0"
+tornado = ">=5.0,<7.0"
 traitlets = ">=5.1.0,<6.0"
 
 [package.extras]
@@ -1046,24 +1046,24 @@ qtconsole = "*"
 
 [[package]]
 name = "jupyter-client"
-version = "7.1.2"
+version = "7.2.0"
 description = "Jupyter protocol implementation and client libraries"
 category = "main"
 optional = false
-python-versions = ">=3.6.1"
+python-versions = ">=3.7"
 
 [package.dependencies]
 entrypoints = "*"
-jupyter-core = ">=4.6.0"
-nest-asyncio = ">=1.5"
+jupyter-core = ">=4.9.2"
+nest-asyncio = ">=1.5.1"
 python-dateutil = ">=2.1"
-pyzmq = ">=13"
-tornado = ">=4.1"
+pyzmq = ">=17"
+tornado = ">=5.0"
 traitlets = "*"
 
 [package.extras]
-doc = ["myst-parser", "sphinx (>=1.3.6)", "sphinx-rtd-theme", "sphinxcontrib-github-alt"]
-test = ["codecov", "coverage", "ipykernel", "ipython", "mock", "mypy", "pre-commit", "pytest", "pytest-asyncio", "pytest-cov", "pytest-timeout", "jedi (<0.18)"]
+doc = ["ipykernel", "myst-parser", "sphinx (>=1.3.6)", "sphinx-rtd-theme", "sphinxcontrib-github-alt"]
+test = ["codecov", "coverage", "ipykernel (>=5.5.6)", "ipython", "mypy", "pre-commit", "pytest", "pytest-asyncio", "pytest-cov", "pytest-timeout", "jedi (<0.18)"]
 
 [[package]]
 name = "jupyter-console"
@@ -1832,11 +1832,11 @@ py = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "qtconsole"
-version = "5.2.2"
+version = "5.3.0"
 description = "Jupyter Qt console"
 category = "main"
 optional = false
-python-versions = ">= 3.6"
+python-versions = ">= 3.7"
 
 [package.dependencies]
 ipykernel = ">=4.1"
@@ -1845,7 +1845,7 @@ jupyter-client = ">=4.1"
 jupyter-core = "*"
 pygments = "*"
 pyzmq = ">=17.1"
-qtpy = "*"
+qtpy = ">=2.0.1"
 traitlets = "*"
 
 [package.extras]
@@ -2085,7 +2085,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "spacy"
-version = "3.1.5"
+version = "3.1.6"
 description = "Industrial-strength Natural Language Processing (NLP) in Python"
 category = "main"
 optional = false
@@ -2094,6 +2094,7 @@ python-versions = ">=3.6"
 [package.dependencies]
 blis = ">=0.4.0,<0.8.0"
 catalogue = ">=2.0.6,<2.1.0"
+click = "<8.1.0"
 cymem = ">=2.0.2,<2.1.0"
 jinja2 = "*"
 murmurhash = ">=0.28.0,<1.1.0"
@@ -2517,7 +2518,7 @@ sweeps = ["numpy (>=1.15,<1.21)", "scipy (>=1.5.4)", "pyyaml", "scikit-learn (==
 
 [[package]]
 name = "wasabi"
-version = "0.9.0"
+version = "0.9.1"
 description = "A lightweight console printing and formatting toolkit"
 category = "main"
 optional = false
@@ -2700,12 +2701,12 @@ blis = [
     {file = "blis-0.7.7.tar.gz", hash = "sha256:5d4a81f9438db7a19ac8e64ad41331f65a659ea8f3bb1889a9c2088cfd9fe104"},
 ]
 boto3 = [
-    {file = "boto3-1.21.27-py3-none-any.whl", hash = "sha256:f165790439117e3fd40f8c06826845068852a70ca5ac62adb192405c97f117e1"},
-    {file = "boto3-1.21.27.tar.gz", hash = "sha256:ef41b9c7b6311d5152bdc78f7de56912c1ed265debf7da14133e1ad00246ad50"},
+    {file = "boto3-1.21.29-py3-none-any.whl", hash = "sha256:b7ce3bf013f0f60e40c2676d5a7b620ed927cfad0aa348a606b10e9a0387f249"},
+    {file = "boto3-1.21.29.tar.gz", hash = "sha256:127ebdf58c8825b53f1eff111e08c49ffffeb1f6d7a5665c9907ce8128fe14b1"},
 ]
 botocore = [
-    {file = "botocore-1.24.27-py3-none-any.whl", hash = "sha256:88e19efcaead99426434d9898d211093b8a8d0cc90af3b84a4ccb9f196894e87"},
-    {file = "botocore-1.24.27.tar.gz", hash = "sha256:2c11db4b94b4b9504d2782acb758d29a7e5cbdfaa826601f222ac9ddcf004dde"},
+    {file = "botocore-1.24.29-py3-none-any.whl", hash = "sha256:de87907d42682179946ddfa113b9334e3c4258404aef19edd8c92381ff54775c"},
+    {file = "botocore-1.24.29.tar.gz", hash = "sha256:b467d64cd773dc4d49ef31b18a8dded554f284f799720bd12e989fe2138fd5b8"},
 ]
 cachetools = [
     {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
@@ -3027,8 +3028,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 ipykernel = [
-    {file = "ipykernel-6.9.2-py3-none-any.whl", hash = "sha256:c977cff576b8425a68d3a6916510903833f0f25ed8d5c282a0c51c35de27bd47"},
-    {file = "ipykernel-6.9.2.tar.gz", hash = "sha256:4c3cc8cb359f2ead70c30f5504971c0d285e2c1c699d2ce9af0216fe9c9fb17c"},
+    {file = "ipykernel-6.10.0-py3-none-any.whl", hash = "sha256:86ebe63f58cb68f299e06a2add4957df0eaebc7b0864de5711accd9c532d7810"},
+    {file = "ipykernel-6.10.0.tar.gz", hash = "sha256:d1c7d92daea5d9b55a33e523d4d17c09ad38e0df17a4e0ed2fa5c97f07f200ba"},
 ]
 ipython = [
     {file = "ipython-8.2.0-py3-none-any.whl", hash = "sha256:1b672bfd7a48d87ab203d9af8727a3b0174a4566b4091e9447c22fb63ea32857"},
@@ -3094,8 +3095,8 @@ jupyter = [
     {file = "jupyter-1.0.0.zip", hash = "sha256:3e1f86076bbb7c8c207829390305a2b1fe836d471ed54be66a3b8c41e7f46cc7"},
 ]
 jupyter-client = [
-    {file = "jupyter_client-7.1.2-py3-none-any.whl", hash = "sha256:d56f1c57bef42ff31e61b1185d3348a5b2bcde7c9a05523ae4dbe5ee0871797c"},
-    {file = "jupyter_client-7.1.2.tar.gz", hash = "sha256:4ea61033726c8e579edb55626d8ee2e6bf0a83158ddf3751b8dd46b2c5cd1e96"},
+    {file = "jupyter_client-7.2.0-py3-none-any.whl", hash = "sha256:c5d9177edb74a0a0d060965dd33ec589b58cf7d1a16f9b60c465404852e0f992"},
+    {file = "jupyter_client-7.2.0.tar.gz", hash = "sha256:00e284dd1a5ac605ead8a42ada2a97041b642c1ef6cefb30c3c415b4eb94bead"},
 ]
 jupyter-console = [
     {file = "jupyter_console-6.4.3-py3-none-any.whl", hash = "sha256:e630bcb682c0088dda45688ad7c2424d4a825c8acf494cb036ced03ed0424841"},
@@ -3337,6 +3338,7 @@ numpy = [
     {file = "numpy-1.22.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:8251ed96f38b47b4295b1ae51631de7ffa8260b5b087808ef09a39a9d66c97ab"},
     {file = "numpy-1.22.3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:48a3aecd3b997bf452a2dedb11f4e79bc5bfd21a1d4cc760e703c31d57c84b3e"},
     {file = "numpy-1.22.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a3bae1a2ed00e90b3ba5f7bd0a7c7999b55d609e0c54ceb2b076a25e345fa9f4"},
+    {file = "numpy-1.22.3-cp310-cp310-win32.whl", hash = "sha256:f950f8845b480cffe522913d35567e29dd381b0dc7e4ce6a4a9f9156417d2430"},
     {file = "numpy-1.22.3-cp310-cp310-win_amd64.whl", hash = "sha256:08d9b008d0156c70dc392bb3ab3abb6e7a711383c3247b410b39962263576cd4"},
     {file = "numpy-1.22.3-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:201b4d0552831f7250a08d3b38de0d989d6f6e4658b709a02a73c524ccc6ffce"},
     {file = "numpy-1.22.3-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:f8c1f39caad2c896bc0018f699882b345b2a63708008be29b1f355ebf6f933fe"},
@@ -3812,8 +3814,8 @@ pyzmq = [
     {file = "pyzmq-22.3.0.tar.gz", hash = "sha256:8eddc033e716f8c91c6a2112f0a8ebc5e00532b4a6ae1eb0ccc48e027f9c671c"},
 ]
 qtconsole = [
-    {file = "qtconsole-5.2.2-py3-none-any.whl", hash = "sha256:4aa6a3e600e0c8cf16853f2378311bc2371f57cb0f22ecfc28994f4cf409ee2e"},
-    {file = "qtconsole-5.2.2.tar.gz", hash = "sha256:8f9db97b27782184efd0a0f2d57ea3bd852d053747a2e442a9011329c082976d"},
+    {file = "qtconsole-5.3.0-py3-none-any.whl", hash = "sha256:75f2ded876444454edcb5a53262149e33b53db3a4a53116b7c3df52830905b0f"},
+    {file = "qtconsole-5.3.0.tar.gz", hash = "sha256:8e3520fdc75e46abc4cc6cffeca16fa2652754109b8ae839fa28e27d1eba5625"},
 ]
 qtpy = [
     {file = "QtPy-2.0.1-py3-none-any.whl", hash = "sha256:d93f2c98e97387fcc9d623d509772af5b6c15ab9d8f9f4c5dfbad9a73ad34812"},
@@ -4065,22 +4067,22 @@ soupsieve = [
     {file = "soupsieve-2.3.1.tar.gz", hash = "sha256:b8d49b1cd4f037c7082a9683dfa1801aa2597fb11c3a1155b7a5b94829b4f1f9"},
 ]
 spacy = [
-    {file = "spacy-3.1.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:e0be6af9d6243d4580c5e6c1a99314ee79dc70c742587598d40b9d463118bb24"},
-    {file = "spacy-3.1.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:402d4de5523c3499aab34c04d443a4372ba09419a0042d33f1ae3a82a3c13634"},
-    {file = "spacy-3.1.5-cp310-cp310-win_amd64.whl", hash = "sha256:a9cb3a06259f1fd45860e81dce894995b50cef2c49c1e2d034afbe5cab665c05"},
-    {file = "spacy-3.1.5-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:d9c0382c74b16245b53686769afbd536799891b55be75d2cffb065c16e4da4b2"},
-    {file = "spacy-3.1.5-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:67dac21066d4dd40628dcdc8b88efee06ed10aed498cd5843c375c960608e030"},
-    {file = "spacy-3.1.5-cp36-cp36m-win_amd64.whl", hash = "sha256:53c2755acd9d6825d65999b2098619e8e2347cffc84b974f577c15fa9231f1e0"},
-    {file = "spacy-3.1.5-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:ddbe60d97636fb875404e32048d9ae30aaa7236bd24422ca0922b8613de275c4"},
-    {file = "spacy-3.1.5-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cfd9445df951a2caf3d5ac2d7a329a26a37320fcd8d7c40ee93f11d53d5f62ba"},
-    {file = "spacy-3.1.5-cp37-cp37m-win_amd64.whl", hash = "sha256:1d208e52b5f04cd71165b2b39b20eaee5acaa4c8597b131113449cc2d3b051d2"},
-    {file = "spacy-3.1.5-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:7860ebc0c77a049a083379149bbfda77bc7546cf185e2205370bb12a11923f56"},
-    {file = "spacy-3.1.5-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ad0574e44cdcf4ebb6a105f8f7412464cabe7580948b2a63cb61fe2acf0e38c9"},
-    {file = "spacy-3.1.5-cp38-cp38-win_amd64.whl", hash = "sha256:af0c2bfa34848baeb11829b3771866439e25dc262cd1252fee41b2d6417bc89d"},
-    {file = "spacy-3.1.5-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:5842e4f36624d8f542a98959105338308e70b378308249ecfb4cc31857b5de0a"},
-    {file = "spacy-3.1.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c90f13d300f307e9a613af1bb6e35bdbf2b26f4ace99a40bbbc79fc269ebca74"},
-    {file = "spacy-3.1.5-cp39-cp39-win_amd64.whl", hash = "sha256:b0567ada3e0684872516ce3cd728b161f3c4158f3c3fdcf17eca91d457791cc0"},
-    {file = "spacy-3.1.5.tar.gz", hash = "sha256:c931b7b72680c07dfd4d893581623e37fae48319eec3c53b77ec5210e4485b6f"},
+    {file = "spacy-3.1.6-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b82aa332b890b3cf01d393d1243980570fc5ac6bd8c8f476a8a242b16e5522d7"},
+    {file = "spacy-3.1.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0460783576dd254ed48fae1609f2b5861f5dc7a49ae4d9c864a579437890b103"},
+    {file = "spacy-3.1.6-cp310-cp310-win_amd64.whl", hash = "sha256:a0467aebb35fa2d2fef4a89487bc4b89c82dbd4edb2021bea3af7d5e8819b438"},
+    {file = "spacy-3.1.6-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:7d5cea1e0efa13eebc7e4e2523eef2cc0ab6ff36208b709c067ee58b41c9594e"},
+    {file = "spacy-3.1.6-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9cac8e42c3a7173e03b185a488ba7f67628e9e10334f081bd00f429d47bc5896"},
+    {file = "spacy-3.1.6-cp36-cp36m-win_amd64.whl", hash = "sha256:3823030bbfc22fbb8b7d04fca93a973e3e87db6eed48e448451e7804fa6c1019"},
+    {file = "spacy-3.1.6-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:1b02a52138649a478e90332b63f8a44c4479565735faf14d20f428c3c8510594"},
+    {file = "spacy-3.1.6-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7cf422fc8cad2ce149164d8753c2267cf17afec3d84ed38efa5a2d43f4fb6731"},
+    {file = "spacy-3.1.6-cp37-cp37m-win_amd64.whl", hash = "sha256:b660c97c9e7ec63e2d45a77263d7300d12e91c6b924ae3b01fb6ec7427b48a04"},
+    {file = "spacy-3.1.6-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:0a60a15a2367358e12647d785c6289c0a0f8867f52d520f2b8ed0f74bbbcb15d"},
+    {file = "spacy-3.1.6-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f821bd6f0a43596acc1f3b30a87eedf5325386a3e65c2592d2f0d20c729599b5"},
+    {file = "spacy-3.1.6-cp38-cp38-win_amd64.whl", hash = "sha256:798d9787e82ca5c6f56c8fc75832cb691fa270e9708b59ab5debd877e0605824"},
+    {file = "spacy-3.1.6-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:8274c8d5595ce5e289e3b989f12e09c85c86c3731d18ef82d6c22f50f9d05319"},
+    {file = "spacy-3.1.6-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:49dbcff9e128043aee2b769b79d58146f1cf54fbd1544f3e26f88c34c60cd569"},
+    {file = "spacy-3.1.6-cp39-cp39-win_amd64.whl", hash = "sha256:0111cae14396dc48e3e17ce79664f1873bb21cec4d92501effe5132f624f645e"},
+    {file = "spacy-3.1.6.tar.gz", hash = "sha256:a485709b10152d50742d1d7f2ee5115e2260695030ee41d2cd4f2b435c63484a"},
 ]
 spacy-legacy = [
     {file = "spacy-legacy-3.0.9.tar.gz", hash = "sha256:4f7dcbc4e6c8e8cb4eadbb009f9c0a1a2a67442e0032c8d6776c9470c3759903"},
@@ -4295,8 +4297,8 @@ wandb = [
     {file = "wandb-0.12.11.tar.gz", hash = "sha256:808c832a109cdd49f85226446b4224c77ff3bd81c0a9470e8fce43e5306a39a0"},
 ]
 wasabi = [
-    {file = "wasabi-0.9.0-py3-none-any.whl", hash = "sha256:f40f317981d019903db5b69eb2bf78519c9e165c1dfdbd0452e4ca81ff9a31d2"},
-    {file = "wasabi-0.9.0.tar.gz", hash = "sha256:152245d892030a3a7b511038e9472acff6d0e237cfe4123fef0d147f2d3274fc"},
+    {file = "wasabi-0.9.1-py3-none-any.whl", hash = "sha256:217edcb2850993c7931399e7419afccde13539d589e333bc85f9053cf0bb1772"},
+    {file = "wasabi-0.9.1.tar.gz", hash = "sha256:ada6f13e9b70ef26bf95fad0febdfdebe2005e29a08ad58f4bbae383a97298cf"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

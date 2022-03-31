@@ -3,7 +3,7 @@ Download details of listing
 """
 import json
 import multiprocessing
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Union
 import time
 from itertools import product
 from multiprocessing.pool import Pool
@@ -17,6 +17,22 @@ from helpers import (
     save_json,
 )
 import istarmap
+
+
+class Arguments(tap.Tap):
+    listings: List[Path]
+    # directory containing a list of folders with listings.txt
+    # this directory should be generated using search_listings.py
+
+    output: Path = Path("merlin")
+    # this folder is going to be used by extract_photo_metadata.py
+
+    num_splits: int = 10 # how many machines are going to work on it?
+    start: int = 0
+    num_procs: int = 1
+    with_info: bool = False # download details on listing
+    with_review: bool = False # download reviews 
+    with_photo: bool = False # download URLs to photos
 
 
 def sleep():
@@ -35,7 +51,6 @@ def prepare_path(path: Path, *args: str) -> Path:
 
 
 def _download_info(listing_id: int, path: Path):
-    path = prepare_path(path, str(listing_id))
     dest = path / "room1.json"
     if dest.is_file():
         return
@@ -61,7 +76,6 @@ def _download_info(listing_id: int, path: Path):
 
 
 def _download_reviews(listing_id: int, path: Path, limit=50):
-    path = prepare_path(path, str(listing_id))
     dest = path / "reviews.json"
     if dest.is_file():
         return
@@ -113,7 +127,6 @@ def _download_reviews(listing_id: int, path: Path, limit=50):
 
 
 def _download_photo_tour(listing_id: int, path: Path):
-    path = prepare_path(path, str(listing_id))
 
     dest = path / "photos.json"
     if dest.is_file():
@@ -140,25 +153,22 @@ def _download_photo_tour(listing_id: int, path: Path):
     sleep()
 
 
-def download_listing(listing_id: int, path: Path):
-    _download_info(listing_id, path)
-    _download_reviews(listing_id, path)
-    _download_photo_tour(listing_id, path)
+def download_listing(listing_id: int, args: Arguments):
+    path = prepare_path(args.output, str(listing_id))
+
+    if args.with_info:
+        _download_info(listing_id, path)
+    if args.with_review:
+        _download_reviews(listing_id, path)
+    if args.with_photo:
+        _download_photo_tour(listing_id, path)
 
 
-class Arguments(tap.Tap):
-    listings: List[Path]
-    # directory containing a list of folders with listings.txt
-    # this directory should be generated using search_listings.py
-
-    output: Path = Path("merlin")
-    # this folder is going to be used by extract_photo_metadata.py
-
-    num_splits: int = 10 # how many machines are going to work on it?
-    start: int = 0
-    num_procs: int = 1
 
 
+def read_lines_from_txt(file: Union[str, Path]) -> List[str]:
+    with open(file) as fid:
+        return [f.strip() for f in fid.readlines()]
 
 
 if __name__ == "__main__":
@@ -169,7 +179,7 @@ if __name__ == "__main__":
     listings = []
     for listing in args.listings:
         for ltxt in listing.rglob('listings.txt'):
-            listings.append(ltxt)
+            listings += read_lines_from_txt(ltxt)
 
     print(f'Found {len(listings)} listings')
     listings = listings[args.start :: args.num_splits]
@@ -180,8 +190,8 @@ if __name__ == "__main__":
             list(
                 tqdm(
                     pool.istarmap(  # type: ignore
-                        _download_photo_tour,
-                        product(listings, [args.output]),
+                        download_listing,
+                        product(listings, [args]),
                         chunksize=1,
                     ),
                     total=len(listings),
@@ -190,4 +200,4 @@ if __name__ == "__main__":
 
     else:
         for listing in tqdm(listings):
-            _download_photo_tour(listing, args.output)
+            download_listing(listing, args)
