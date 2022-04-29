@@ -90,7 +90,7 @@ def search_location(name: str, dest: Path, limit: int):
         int(pagination["totalCount"]) if pagination["totalCount"] is not None else 0
     )
 
-    assert pagination["pageLimit"] == limit, pagination
+    # assert pagination["pageLimit"] == limit, pagination
 
     for counter in range(limit, int(num_listings), limit):
         data = search_page(name, counter, limit)
@@ -149,21 +149,28 @@ def run_downloader(args: Arguments):
         process: (int) number of process to run
         images_url:(list) list of images url
     """
-    print(f"Running {args.num_procs} procs")
-    correspondances = sorted(list(args.correspondance.iterdir()))[args.start :]
-    with Pool(args.num_procs) as pool:
-        list(
-            tqdm(
-                pool.imap(search_locations, correspondances, chunksize=1), total=len(correspondances)
+    if args.num_procs == 0:
+        print(f"Running without parallelization")
+        correspondances = sorted(list(args.correspondance.iterdir()))[args.start :]
+        for correspondance in tqdm(correspondances):
+            search_locations(correspondance)
+    else:
+        print(f"Running {args.num_procs} procs")
+        correspondances = sorted(list(args.correspondance.iterdir()))[args.start :]
+        with Pool(args.num_procs) as pool:
+            list(
+                tqdm(
+                    pool.imap(search_locations, correspondances, chunksize=1),
+                    total=len(correspondances),
+                )
             )
-        )
 
 
 if __name__ == "__main__":
     args = Arguments().parse_args()
     print(args)
 
-    if not args.correspondance.is_dir() or list(args.correspondance.glob('*.tsv')) == []:
+    if not args.correspondance.is_dir() or list(args.correspondance.glob("*.tsv")) == []:
         print("Making correspondance")
         make_correspondance(args)
 
