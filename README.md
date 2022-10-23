@@ -1,15 +1,15 @@
 # :houses: BnB Dataset :houses:
 
-[![MIT](https://img.shields.io/github/license/airbert-vln/bnb-dataset)](./LICENSE.md)
-[![arXiv](https://img.shields.io/badge/arXiv-2108.09105-red.svg)](https://arxiv.org/abs/2108.09105)
-[![R2R 1st](https://img.shields.io/badge/R2R-🥇-green.svg)](https://eval.ai/web/challenges/challenge-page/97/leaderboard/270)
+[![MIT](https://img.shields.io/github/license/airbert-vln/bnb-dataset?style=for-the-badge)](./LICENSE.md)
+[![arXiv](https://img.shields.io/badge/arXiv-2108.09105-red.svg?style=for-the-badge)](https://arxiv.org/abs/2108.09105)
+[![R2R 1st](https://img.shields.io/badge/R2R-🥇-green.svg?style=for-the-badge)](https://eval.ai/web/challenges/challenge-page/97/leaderboard/270)
 
 This contains a set of scripts for downloading a dataset from Airbnb.
 
 
 ## :hammer_and_wrench: 1. Get started
 
-First, you need `[git lfs](https://git-lfs.github.com/)` to clone the repository. Install it from command line:
+First, you need [`git lfs`](https://git-lfs.github.com/) to clone the repository. Install it from command line:
 
 ```bash
 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
